@@ -101,7 +101,7 @@
                 const { data, error } = await supabaseClient
                     .from('inventaris')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('id_aset', { ascending: true });
 
                 if (error) throw error;
 
