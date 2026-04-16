@@ -258,6 +258,23 @@
         });
 
         fetchData();
+
+        function updateStats(data) {
+    // 1. Total Aset
+    document.getElementById('totalAset').innerText = data.length;
+    
+    // 2. Hitung yang statusnya 'Active' atau 'Aktif'
+    const aktif = data.filter(i => {
+        const s = i.status ? i.status.toLowerCase() : '';
+        return s === 'active' || s === 'aktif';
+    }).length;
+    
+    document.getElementById('unitAktif').innerText = aktif;
+    
+    // 3. Sisanya (Total dikurang yang aktif)
+    document.getElementById('unitRusak').innerText = data.length - aktif;
+}
+
     </script>
 </body>
 </html>
