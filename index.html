@@ -329,8 +329,12 @@ async function handleLogin() {
 
 // 3. Fungsi untuk tombol Logout
 async function handleLogout() {
-    await supabaseClient.auth.signOut();
-    location.reload(); // Refresh halaman untuk balik ke form login
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        console.error('Error logging out:', error.message);
+    }
+    // Paksa refresh halaman balik ke form login
+    window.location.reload(); 
 }
 
 // JALANKAN INI SEBAGAI PERINTAH UTAMA
