@@ -34,6 +34,10 @@ body {
     .no-print { display: none !important; } 
     body.printing-label .main-content { display: none !important; } 
     body { background-image: none !important; background-color: white !important; }
+    canvas, img, svg {
+        image-rendering: pixelated !important;
+        image-rendering: crisp-edges !important;
+    }
 }
 
 .print-only-label { display: none; }
