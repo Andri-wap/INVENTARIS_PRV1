@@ -211,7 +211,7 @@ body {
             tbody.innerHTML = data.map(item => `
                 <tr class="hover text-center">
                     <td class="p-2 bg-white">
-                        <svg class="barcode mx-auto" jsbarcode-value="${item.id_aset}" jsbarcode-format="code128" jsbarcode-width="1" jsbarcode-height="30" jsbarcode-fontSize="12"></svg>
+                        <svg class="barcode mx-auto" jsbarcode-value="${item.id_aset}" jsbarcode-format="code128" jsbarcode-width="2" jsbarcode-height="32" jsbarcode-fontSize="15"></svg>
                     </td>
                     <td class="font-bold uppercase">${item.user || '-'}</td>
                     <td class="font-semibold text-primary uppercase">${item.dept || '-'}</td>
