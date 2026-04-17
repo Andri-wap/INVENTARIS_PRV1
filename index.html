@@ -310,7 +310,7 @@ body {
                     <div style="font-family: sans-serif;">User: ${user}</div>
                 </div>
             `;
-            JsBarcode("#singleBarcode", id, { format: "code128", width: 2, height: 60 });
+            JsBarcode("#singleBarcode", id, { format: "code128", width: 3, height: 100 });
             document.body.classList.add('printing-label');
             setTimeout(() => { window.print(); document.body.classList.remove('printing-label'); }, 500);
         }
