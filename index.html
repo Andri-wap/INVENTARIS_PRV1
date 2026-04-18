@@ -418,5 +418,19 @@ async function handleLogout() {
 }
 
     </script>
+    // Mencegah Klik Kanan
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+// Mencegah Shortcut Keyboard (seperti Ctrl+U, Ctrl+S, Ctrl+Shift+I)
+document.onkeydown = function(e) {
+    if (e.ctrlKey && 
+        (e.keyCode === 67 || // Ctrl+C
+         e.keyCode === 86 || // Ctrl+V
+         e.keyCode === 85 || // Ctrl+U (View Source)
+         e.keyCode === 83 || // Ctrl+S (Save Page)
+         e.keyCode === 117)) {
+        return false;
+    }
+};
 </body>
 </html>
