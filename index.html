@@ -280,6 +280,20 @@ body.role-viewer .aksi-kolom {
         alert("Gagal: ID Aset [" + idAset + "] tidak ditemukan. Pastikan nama kolom di Supabase adalah 'id_aset' (huruf kecil semua).");
         fetchData(); // Reset tampilan ke data asli
     }
+    {
+    console.error("Gagal update:", error);
+    // Jika ditolak oleh RLS, biasanya muncul error 403 atau message policy
+    if (error.code === '42501') { 
+        alert("Maaf bro, cuma Super Admin (Andri) yang bisa ngubah data!");
+    } else {
+        alert("Gagal simpan: " + error.message);
+    }
+    fetchData(); // Refresh tampilan biar teks balik ke semula
+} else {
+    console.log("Data berhasil diupdate oleh Super Admin!");
+    // fetchData(); // Aktifkan ini kalau mau refresh otomatis
+}
+           
 }
         function updateStats(data) {
     if (!data) return;
