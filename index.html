@@ -225,7 +225,7 @@ body.role-viewer .aksi-kolom {
 
         async function fetchData() {
             try {
-                const { data, error } = await supabaseClient.from('inventaris').select('*').order('created_at', { ascending: true });
+                const { data, error } = await supabaseClient.from('inventaris').select('*').order('id_aset', { ascending: true });
                 if (error) throw error;
                 document.getElementById('statusConnection').innerText = "Terhubung";
                 document.getElementById('statusConnection').className = "badge badge-success text-white font-bold";
