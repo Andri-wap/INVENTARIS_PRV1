@@ -237,6 +237,22 @@ body.role-viewer .aksi-kolom {
             `).join('');
             JsBarcode(".barcode").init();
         }
+        async function updateField(id, kolom, nilaiBaru) {
+    const nilaiClean = nilaiBaru.trim().toUpperCase(); // Biar rapi otomatis huruf besar
+    
+    const { error } = await supabase
+        .from('inventaris') // Pastikan nama tabel di Supabase kamu 'inventaris'
+        .update({ [kolom]: nilaiClean })
+        .eq('id', id);
+
+    if (error) {
+        console.error("Gagal update:", error);
+        alert("Gagal simpan perubahan bro!");
+    } else {
+        console.log("Data berhasil diupdate!");
+        // Optional: panggil updateStats() kalau yang diedit mempengaruhi jumlah laptop/pc
+    }
+}
 
         function updateStats(data) {
     if (!data) return;
