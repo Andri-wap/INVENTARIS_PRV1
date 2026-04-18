@@ -243,6 +243,7 @@ body.role-viewer .aksi-kolom {
                     <td class="p-2 bg-white">
                         <svg class="barcode mx-auto" jsbarcode-value="${item.id_aset}" jsbarcode-format="code128" jsbarcode-width="1" jsbarcode-height="30" jsbarcode-fontSize="13"></svg>
                     </td>
+                    // Pastikan pakai item.id_aset dan tambahkan .trim()
                     <td class="editable uppercase font-bold" contenteditable="true" onblur="updateField('${item.id_aset}', 'user', this.innerText.trim())">${item.user || '-'}</td>
                     <td class="editable uppercase font-semibold" contenteditable="true" onblur="updateField('${item.id_aset}', 'dept', this.innerText.trim())">${item.dept || '-'}</td>
                     <td>${item.device || '-'}</td>
@@ -255,27 +256,31 @@ body.role-viewer .aksi-kolom {
             `).join('');
             JsBarcode(".barcode").init();
         }
-       async function updateField(idAset, kolom, nilaiBaru) {
+       async function updateField(idRaw, kolom, nilaiBaru) {
+    // 1. Bersihkan ID dan Nilai baru dari spasi tak terlihat
+    const idAset = idRaw.trim(); 
     const nilaiClean = nilaiBaru.trim().toUpperCase();
-    const idClean = idAset.trim();
     
-    // Pakai supabaseClient sesuai baris 208 di kodinganmu
+    console.log(`Menjalankan update untuk ID: ${idAset} pada kolom: ${kolom}`);
+
+    // 2. Kirim ke Supabase menggunakan supabaseClient (sesuai baris 208 kamu)
     const { data, error } = await supabaseClient
         .from('inventaris')
         .update({ [kolom]: nilaiClean })
-        .eq('id_aset', idClean) // Mencari berdasarkan kolom id_aset
+        .eq('id_aset', idAset) // Pastikan kolom di Supabase namanya 'id_aset'
         .select();
 
     if (error) {
-        console.error("Gagal Update:", error);
+        console.error("Error Supabase:", error);
         alert("Gagal simpan: " + error.message);
     } else if (data && data.length > 0) {
-        console.log("Mantap! Data berhasil diubah di database.");
-        // Opsional: panggil fetchData() kalau mau layar langsung refresh total
-        // await fetchData(); 
+        console.log("Berhasil! Data di database sudah berubah.");
+        // Ambil data terbaru agar tampilan stats & tabel sinkron
+        fetchData(); 
     } else {
-        // Ini kalau ID-nya beneran gak ketemu
-        alert("Gagal: ID Aset [" + idClean + "] tidak ada di database. Cek penulisan kolom id_aset.");
+        // Jika muncul ini, berarti ID 'P1.INV.KOM.0001' tidak ditemukan di kolom 'id_aset'
+        alert("Gagal: ID Aset [" + idAset + "] tidak ditemukan. Pastikan nama kolom di Supabase adalah 'id_aset' (huruf kecil semua).");
+        fetchData(); // Reset tampilan ke data asli
     }
 }
         function updateStats(data) {
