@@ -269,9 +269,15 @@ body.role-viewer .aksi-kolom {
         .select();
 
     if (error) {
-        console.error("Error Supabase:", error);
-        alert("Gagal simpan: " + error.message);
-    } else if (data && data.length > 0) {
+            console.error("Gagal update:", error);
+            // Cek apakah error karena RLS (Forbidden)
+            if (error.code === '42501') { 
+                alert("Maaf bro, cuma Super Admin (Andri) yang bisa ngubah data!");
+            } else {
+                alert("Gagal simpan: " + error.message);
+            }
+            fetchData(); // Refresh tampilan biar teks balik ke semula
+    }else if (data && data.length > 0) {
         console.log("Berhasil! Data di database sudah berubah.");
         // Ambil data terbaru agar tampilan stats & tabel sinkron
         fetchData(); 
