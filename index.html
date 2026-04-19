@@ -63,7 +63,21 @@ body.role-viewer .aksi-kolom {
     border-radius: 4px;
     color: white;
 }
-        
+  .table-wrapper {
+    max-height: 60vh; 
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.05); /* Biar tetap transparan mewah */
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: #1a1a1a !important; /* Warna gelap biar kontras */
+}      
     </style>
 </head>
 <body class="bg-base-200 min-h-screen">
@@ -180,18 +194,17 @@ body.role-viewer .aksi-kolom {
                 <input type="text" id="searchInput" placeholder="Cari nama, ID, atau departemen..." class="input input-bordered w-full max-w-xs focus:input-primary" />
             </div>
 
-            <div class="card bg-base-100 shadow-xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra w-full">
-                        <thead>
-                            <tr class="bg-base-300 text-center">
-                                <th>BARCODE</th>
-                                <th>USER</th>
-                                <th>DEPT</th>
-                                <th>DEVICE</th>
-                                <th>STATUS</th>
-                                <th class="no-print">AKSI</th>
-                            </tr>
+            <div class="card bg-base-100 shadow-xl"> 
+                <div class="table-wrapper"> 
+                    <table class="table table-zebra w-full"> <thead>
+                <tr class="bg-base-300 text-center">
+                    <th>BARCODE</th>
+                    <th>USER</th>
+                    <th>DEPT</th>
+                    <th>DEVICE</th>
+                    <th>STATUS</th>
+                    <th class="no-print">AKSI</th>
+                </tr>
                         </thead>
                         <tbody id="inventoryBody">
                             <tr><td colspan="6" class="text-center py-10">Memuat data...</td></tr>
@@ -200,8 +213,6 @@ body.role-viewer .aksi-kolom {
                 </div>
             </div>
         </div>
-    </div>
-
     <script>
         const SUPABASE_URL = 'https://xsqabypdhudqwyeegfci.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzcWFieXBkaHVkcXd5ZWVnZmNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDExNTksImV4cCI6MjA5MTkxNzE1OX0.mv_XCnfHsmC5ve9rm-J0e0U_AxQ-GS6B5sxf_4a-NWM'; 
