@@ -375,14 +375,14 @@ thead th {
     document.getElementById('totalPajak').innerText = jmlPajak; 
 
      // 6. Hitung Dept PPIC (Cari kata PPIC di dalam teks)
-    const jmlHRD = data.filter(i => {
+    const jmlPPIC = data.filter(i => {
         const teksDept = (i.PPIC || i.PIC || "").toString().toUpperCase();
         return teksDept.includes("PPIC");
     }).length;
     document.getElementById('totalPPIC').innerText = jmlPPIC;
 
     // 7. Hitung Dept MD
-    const jmlPajak = data.filter(i => {
+    const jmlMD = data.filter(i => {
         const teksDept = (i.MD || i.MD ROOM || "").toString().toUpperCase();
         return teksDept.includes("MD") || teksDept.includes("MD ROOM");
     }).length;
