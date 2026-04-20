@@ -146,6 +146,19 @@ thead th {
     </div>
 </div>
 
+    <div class="stats shadow">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">Dept: HRD</div>
+    <div id="totalHRD" class="stat-value text-primary text-xl">0</div>
+  </div>
+</div>
+
+<div class="stats shadow">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">Dept: PAJAK</div>
+    <div id="totalPajak" class="stat-value text-primary text-xl">0</div>
+  </div>
+</div>
 
             <div class="flex flex-wrap gap-2 mb-6 no-print">
                 <button onclick="toggleForm()" class="btn btn-primary text-white">+ Tambah Aset</button>
@@ -332,6 +345,19 @@ thead th {
     }).length;
     document.getElementById('unitRusak').innerText = rusak;
 }
+
+            // 6. Hitung Dept HRD
+    const jmlHRD = data.filter(i => 
+        i.dep && i.dep.toLowerCase().includes('hrd')
+    ).length;
+    document.getElementById('totalHRD').innerText = jmlHRD;
+
+    // 7. Hitung Dept PAJAK
+    const jmlPajak = data.filter(i => 
+        i.dep && i.dep.toLowerCase().includes('pajak')
+    ).length;
+    document.getElementById('totalPajak').innerText = jmlPajak;
+
 
         function getStatusClass(s) {
             const st = s?.toLowerCase();
