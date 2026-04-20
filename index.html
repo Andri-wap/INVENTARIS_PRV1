@@ -344,19 +344,22 @@ thead th {
         return s === 'maintenance' || s === 'broken' || s === 'rusak';
     }).length;
     document.getElementById('unitRusak').innerText = rusak;
-}
-    // 6. Hitung Dept HRD
-    const jmlHRD = data.filter(i => 
-        i.dept && i.dept.toLowerCase().includes('hrd')
-    ).length;
+
+    // 6. Hitung Dept HRD (Cari kata HRD di dalam teks)
+    const jmlHRD = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+        return teksDept.includes("HRD");
+    }).length;
     document.getElementById('totalHRD').innerText = jmlHRD;
 
-    // 7. Hitung Dept PAJAK
-    const jmlPajak = data.filter(i => 
-        i.dept && i.dept.toLowerCase().includes('pajak')
-    ).length;
-    document.getElementById('totalPajak').innerText = jmlPajak;
-
+    // 7. Hitung Dept PAJAK (Cari kata PAJAK atau TAX)
+    const jmlPajak = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+        return teksDept.includes("PAJAK") || teksDept.includes("TAX");
+    }).length;
+    document.getElementById('totalPajak').innerText = jmlPajak;        
+}    
+        
 
         function getStatusClass(s) {
             const st = s?.toLowerCase();
