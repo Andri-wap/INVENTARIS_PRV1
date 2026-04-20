@@ -153,19 +153,19 @@ thead th {
   </div>
 </div>
 
-<div class="stats shadow">
+    <div class="stats shadow">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">PAJAK</div>
     <div id="totalPajak" class="stat-value text-primary text-xl">0</div>
   </div>
 </div>
 
-  <div class="stats shadow">
+     <div class="stats shadow">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">PPIC</div>
     <div id="totalPPIC" class="stat-value text-primary text-xl">0</div>
   </div>
-  </div>          
+</div>          
 
             <div class="flex flex-wrap gap-2 mb-6 no-print">
                 <button onclick="toggleForm()" class="btn btn-primary text-white">+ Tambah Aset</button>
@@ -368,7 +368,7 @@ thead th {
 
      // 8. Hitung Dept PPIC
     const jmlPPIC = data.filter(i => {
-        const teksDept = (i.PPIC || i.PIC || "").toString().toUpperCase();
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
         return teksDept.includes("PPIC") || teksDept.includes("PIC");
     }).length;
     document.getElementById('totalPPIC').innerText = jmlPPIC;        
