@@ -165,6 +165,13 @@ thead th {
     <div class="stat-title text-xs text-info">PPIC</div>
     <div id="totalPPIC" class="stat-value text-primary text-xl">0</div>
   </div>
+</div>     
+
+    <div class="stats shadow">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">EXIM</div>
+    <div id="totalEXIM" class="stat-value text-primary text-xl">0</div>
+  </div>
 </div>          
 
             <div class="flex flex-wrap gap-2 mb-6 no-print">
@@ -371,7 +378,14 @@ thead th {
         const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
         return teksDept.includes("PPIC") || teksDept.includes("PIC");
     }).length;
-    document.getElementById('totalPPIC').innerText = jmlPPIC;        
+    document.getElementById('totalPPIC').innerText = jmlPPIC;  
+
+     // 9. Hitung Dept EXIM
+    const jmlEXIM = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+        return teksDept.includes("EXIM") || teksDept.includes("EXM");
+    }).length;
+    document.getElementById('totalEXIM').innerText = jmlEXIM;
 }    
         
 
