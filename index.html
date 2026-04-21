@@ -218,7 +218,15 @@ thead th {
     <div class="stat-title text-xs text-info">CAD</div>
     <div id="totalCAD" class="stat-value text-primary text-xl">0</div>
   </div>
-</div>   
+</div> 
+
+    <div class="stats shadow stat-dept">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">GD.ACC</div>
+    <div id="totalGUDANG ACCESSORIES" class="stat-value text-primary text-xl">0</div>
+  </div>
+</div> 
+    
 </div>
 
     
@@ -464,6 +472,13 @@ thead th {
         return teksDept.includes("CAD") || teksDept.includes("CAD ROOM");
     }).length;
     document.getElementById('totalCAD').innerText = jmlCAD;
+
+    // 14. Hitung Dept CAD
+    const jmlGUDANG ACCESSORIES = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+        return teksDept.includes("GUDANG ACCESSORIES") || teksDept.includes("GUDANG ACCESSORIES");
+    }).length;
+    document.getElementById('totalGUDANG ACCESSORIES').innerText = jmlCAD;
             
             
 }    
