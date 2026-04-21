@@ -488,7 +488,7 @@ thead th {
     document.getElementById('totalGUDANG ACCESSORIES').innerText = jmlGUDANGACCESSORIES;
 
     // 14. Hitung Dept GD.KAIN
-    const jmlGUDANGANGKAIN = data.filter(i => {
+    const jmlGUDANGKAIN = data.filter(i => {
         const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
           return teksDept.includes("GUDANG KAIN") || teksDept.includes("GUDANG KAIN");
     }).length;
