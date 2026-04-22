@@ -240,6 +240,13 @@ thead th {
     <div id="totalPACKING" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
+
+    <div class="stats shadow stat-dept">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">SAMPLE PROD</div>
+    <div id="totalSAMPLEPRODUKSI" class="stat-value text-primary text-xl">0</div>
+  </div>
+</div> 
     
 </div>
 
@@ -507,6 +514,13 @@ thead th {
         return teksDept.includes("PACKING") || teksDept.includes("PACKING");
     }).length;
     document.getElementById('totalPACKING').innerText = jmlPACKING;
+
+      // 14. Hitung Dept GD.KAIN
+    const jmlSAMPLEPRODUKSI = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+          return teksDept.includes("SAMPLE PRODUKSI) || teksDept.includes("SAMPLE PRODUKSI");
+    }).length;
+    document.getElementById('totalSAMPLE PRODUKSI').innerText = jmlSAMPLEPRODUKSI;
 
             
             
