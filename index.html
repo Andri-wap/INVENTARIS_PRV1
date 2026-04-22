@@ -616,7 +616,7 @@ thead th {
     // 23. Hitung Dept IE
     const jmlIE = data.filter(i => {
         const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("IE/PRODUKSI") || teksDept.includes("IE/PRODUKSI");
+          return teksDept.includes("IE/PRODUKSI") || teksDept.includes("IE/MANAGER");
     }).length;
     document.getElementById('totalIE').innerText = jmlIE;
 
