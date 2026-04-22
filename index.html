@@ -518,7 +518,7 @@ thead th {
       // 14. Hitung Dept GD.KAIN
     const jmlSAMPLEPRODUKSI = data.filter(i => {
         const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("SAMPLE PRODUKSI) || teksDept.includes("SAMPLE PRODUKSI");
+          return teksDept.includes("SAMPLE PRODUKSI) || teksDept.includes("SAMPLEPRODUKSI");
     }).length;
     document.getElementById('totalSAMPLE PRODUKSI').innerText = jmlSAMPLEPRODUKSI;
 
