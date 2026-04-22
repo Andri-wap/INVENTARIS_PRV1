@@ -282,6 +282,13 @@ thead th {
     <div id="totalFACTORY MANAGER" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
+
+       <div class="stats shadow stat-dept">
+  <div class="stat p-3">
+    <div class="stat-title text-xs text-info">GM</div>
+    <div id="totalGENERAL MANAGER class="stat-value text-primary text-xl">0</div>
+  </div>
+</div> 
     
 </div>
 
@@ -591,6 +598,14 @@ thead th {
           return teksDept.includes("FACTORY MANAGER") || teksDept.includes("FACTORY MANAGER");
     }).length;
     document.getElementById('totalFACTORY MANAGER').innerText = jmlFACTORYMANAGER;
+
+    // 22. Hitung Dept GM
+    const jmlGENERALMANAGER = data.filter(i => {
+        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
+          return teksDept.includes("GENERAL MANAGER") || teksDept.includes("GENERAL MANAGER");
+    }).length;
+    document.getElementById('totalGENERAL MANAGER').innerText = jmlGENERALMANAGER;
+
 
 
 
