@@ -414,6 +414,7 @@ thead th {
         const SUPABASE_URL = 'https://xsqabypdhudqwyeegfci.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzcWFieXBkaHVkcXd5ZWVnZmNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDExNTksImV4cCI6MjA5MTkxNzE1OX0.mv_XCnfHsmC5ve9rm-J0e0U_AxQ-GS6B5sxf_4a-NWM'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+		let data = [];
       async function checkUser() {
     // Ambil sesi aktif dari Supabase
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -479,7 +480,7 @@ thead th {
         }
     }
     // 2. Kirim ke Supabase menggunakan supabaseClient (sesuai baris 208 kamu)
-    const { data, error } = await supabaseClient
+    const { data: updateResult, error } = await supabaseClient
         .from('inventaris')
         .update({ [kolom]: nilaiClean })
         .eq('id_aset', idAset) // Pastikan kolom di Supabase namanya 'id_aset'
