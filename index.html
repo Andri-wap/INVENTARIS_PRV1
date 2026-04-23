@@ -922,17 +922,6 @@ html5QrcodeScanner.render(onScanSuccess);
         return;
     }
 
-    // Gunakan tanda backtick ( ` ) di awal dan akhir pesan
-let pesan = `📜 RIWAYAT ASET: ${idAset}\n\n`;
-logs.forEach((log, index) => {
-    const tgl = new Date(log.tgl_perubahan).toLocaleString('id-ID');
-    // Di sini juga harus pakai backtick ( ' )
-    pesan += `${index + 1}. [${tgl}]\n`;
-    pesan += `   Dari: ${log.user_lama} ➡️ Ke: ${log.user_baru}\n\n`;
-});
-
-alert(pesan);
-
 		
             // Mencegah Klik Kanan
 document.addEventListener('contextmenu', event => event.preventDefault());
