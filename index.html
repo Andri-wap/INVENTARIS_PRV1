@@ -458,6 +458,10 @@ thead th {
                     <td><div class="badge ${getStatusClass(item.status)} border-none text-white font-bold">${item.status || '-'}</div></td>
                     <td class="no-print aksi-kolom flex gap-1 justify-center">
                         <button onclick="printSingleLabel('${item.id_aset}', '${item.user}', '${item.device}')" class="btn btn-ghost btn-xs text-primary">Label</button>
+						// Tambahkan tombol ini di kolom aksi tabel kamu
+                        <button onclick="lihatHistory('${item.id_aset}')" class="btn btn-xs btn-outline btn-info">
+                         📜 History
+                         </button>
                         <button onclick="deleteAsset('${item.id_aset}')" class="btn btn-ghost btn-xs text-error btn-hapus">Hapus</button>
                     </td>
                 </tr>
@@ -880,7 +884,7 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 html5QrcodeScanner.render(onScanSuccess);
 
 		// --- FUNGSI OTOMATIS CATAT HISTORY KE SUPABASE ---
-async function catatHistory(idAset, lama, baru) {
+    async function catatHistory(idAset, lama, baru) {
     try {
         // Ambil data admin yang sedang login
         const { data: { user } } = await supabaseClient.auth.getUser();
@@ -899,6 +903,33 @@ async function catatHistory(idAset, lama, baru) {
     } catch (err) {
         console.error("Gagal simpan history:", err.message);
     }
+}
+
+	async function lihatHistory(idAset) {
+    const { data: logs, error } = await supabaseClient
+        .from('history_aset')
+        .select('*')
+        .eq('id_aset', idAset)
+        .order('tgl_perubahan', { ascending: false });
+
+    if (error) {
+        alert("Gagal ambil history: " + error.message);
+        return;
+    }
+
+    if (logs.length === 0) {
+        alert("Belum ada riwayat perubahan untuk aset: " + idAset);
+        return;
+    }
+
+    // Susun pesan untuk ditampilkan (atau bisa pakai Modal)
+    let pesan = RIWAYAT ASET: ${idAset}\n\n;
+    logs.forEach((log, index) => {
+        const tgl = new Date(log.tgl_perubahan).toLocaleString('id-ID');
+        pesan += ${index + 1}. [${tgl}]\n   Dari: ${log.user_lama} ➡️ Ke: ${log.user_baru}\n   Oleh: ${log.admin_eksekusi}\n\n;
+    });
+
+    alert(pesan);
 }
 		
             // Mencegah Klik Kanan
