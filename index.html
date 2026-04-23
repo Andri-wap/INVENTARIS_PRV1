@@ -614,8 +614,8 @@ thead th {
 
      // 18. Hitung Dept MD
     const jmlMD = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("MD") || teksDept.includes("MD");
+        const d = (i.dept || i.dep || "").toString().toUpperCase();
+          return d.includes("MD") && !d.includes("PPIC");
     }).length;
     document.getElementById('totalMD').innerText = jmlMD;
 
