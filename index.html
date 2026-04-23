@@ -905,22 +905,6 @@ html5QrcodeScanner.render(onScanSuccess);
     }
 }
 
-	async function lihatHistory(idAset) {
-    const { data: logs, error } = await supabaseClient
-        .from('history_aset')
-        .select('*')
-        .eq('id_aset', idAset)
-        .order('tgl_perubahan', { ascending: false });
-
-    if (error) {
-        alert("Gagal ambil history: " + error.message);
-        return;
-    }
-
-    if (logs.length === 0) {
-        alert("Belum ada riwayat perubahan untuk aset: " + idAset);
-        return;
-    }
 
 		
             // Mencegah Klik Kanan
