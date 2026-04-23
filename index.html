@@ -464,12 +464,20 @@ thead th {
             JsBarcode(".barcode").init();
         }
        async function updateField(idRaw, kolom, nilaiBaru) {
-    // 1. Bersihkan ID dan Nilai baru dari spasi tak terlihat
-    const idAset = idRaw.trim(); 
+    const idAset = idRaw.trim();
     const nilaiClean = nilaiBaru.trim().toUpperCase();
-    
-    console.log(`Menjalankan update untuk ID: ${idAset} pada kolom: ${kolom}`);
 
+    // --- LOGIKA HISTORY MULAI DI SINI ---
+    if (kolom === 'user') {
+        // 1. Cari data lama di variabel global 'data' sebelum diupdate
+        const dataLama = data.find(item => item.id_aset === idAset);
+        const namaLama = dataLama ? dataLama.user : "-";
+
+        // 2. Jika nama user benar-benar berubah, catat history-nya
+        if (namaLama !== nilaiClean) {
+            await catatHistory(idAset, namaLama, nilaiClean);
+        }
+    }
     // 2. Kirim ke Supabase menggunakan supabaseClient (sesuai baris 208 kamu)
     const { data, error } = await supabaseClient
         .from('inventaris')
@@ -869,6 +877,28 @@ function onScanSuccess(decodedText, decodedResult) {
 let html5QrcodeScanner = new Html5QrcodeScanner(
 	"reader", { fps: 20, qrbox: 300, aspectRatio: 1.0});
 html5QrcodeScanner.render(onScanSuccess);
+
+		// --- FUNGSI OTOMATIS CATAT HISTORY KE SUPABASE ---
+async function catatHistory(idAset, lama, baru) {
+    try {
+        // Ambil data admin yang sedang login
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        const { error } = await supabaseClient
+            .from('history_aset') // Pastikan nama tabel di Supabase sama persis
+            .insert([{ 
+                id_aset: idAset, 
+                user_lama: lama, 
+                user_baru: baru, 
+                admin_eksekusi: user ? user.email : 'System' 
+            }]);
+
+        if (error) throw error;
+        console.log("History berhasil dicatat untuk:", idAset);
+    } catch (err) {
+        console.error("Gagal simpan history:", err.message);
+    }
+}
 		
             // Mencegah Klik Kanan
 document.addEventListener('contextmenu', event => event.preventDefault());
