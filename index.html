@@ -926,14 +926,15 @@ async function prosesMutasi(tabelTujuan) {
              .from(tabelHistoryTujuan)
              .insert([{
                 id_aset: aset.id_aset,
-                user: aset.user,              // Nama kolom 'user' di history
-                user_lama: aset.user,         // INI YANG WAJIB ADA (Sesuai error di image_5f6e6a)
-                user_baru: aset.user,         // Kolom user_baru
-                aksi: 'Mutasi Masuk',
-                keterangan: `Diterima dari ${namaPTAsal}`,
-                tgl_perubahan: new Date().toISOString(),
+                user: aset.user,
+                user_lama: aset.user,
+                user_baru: aset.user,
+                aksi: 'Mutasi', 
+                // TAMBAHKAN INI:
+                keterangan: `Pindahan dari ${namaPTAsal} ke ${tabelTujuan === 'inventaris_p1' ? 'PT PANRAMA' : 'PT KEDUA'}`,
+                tgl_perubahan: new Date().toLocaleString('id-ID'), // Format tanggal lokal Indonesia
                 admin_eksekusi: 'Super Admin'
-                    }]);
+                }]);
         if (histErr) {
              console.error("Gagal simpan history:", histErr.message);
              alert("History Gagal: " + histErr.message);
