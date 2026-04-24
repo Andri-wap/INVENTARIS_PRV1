@@ -923,13 +923,14 @@ async function prosesMutasi(tabelTujuan) {
 
         // 4. Masukkan Log ke tabel History Tujuan
         await supabaseClient
-            .from(tabelHistoryTujuan)
-            .insert([{
-                id_aset: aset.id_aset,
-                user: aset.user,
-                aksi: 'Mutasi Masuk',
-                keterangan: `Diterima dari ${namaPTAsal}`,
-                tanggal: new Date()
+             .from(tabelHistoryTujuan)
+             .insert([{
+               user: aset.user,              // Nama user aset
+               aksi: 'Mutasi Masuk',         // Jenis aksi
+               keterangan: `Diterima dari ${namaPTAsal}`, 
+               tgl_perubahan: new Date(),    // Sesuai nama kolom di screenshot kamu
+               admin_eksekusi: 'Super Admin' // Atau variabel admin yang sedang login
+               // Jika ada kolom id_aset di history tapi tidak terlihat di foto, tambahkan di sini
             }]);
 
         // 5. Hapus dari tabel asal
