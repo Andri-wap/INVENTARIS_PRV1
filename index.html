@@ -928,10 +928,10 @@ async function prosesMutasi(tabelTujuan) {
         tutupModalTransfer();
         fetchData(); // Supaya data di tabel langsung hilang & pindah
 
-    } catch (err) {
-        console.error("Gagal Mutasi:", err.message);
-        alert("Error: " + err.message);
-    }
+       } catch (err) {
+    console.error("Detail Error Mutasi:", err); // Ini akan memunculkan objek error lengkap di F12
+    alert("Gagal Mutasi! Cek Console F12 untuk detailnya.");
+       }
 }
 function tutupModalTransfer() {
     console.log("Menutup modal..."); // Cek di F12, muncul gak?
