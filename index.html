@@ -433,10 +433,9 @@ thead th {
 		let data = [];
      async function checkUser() {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    
     const loginSec = document.getElementById('loginSection');
     const pilihModal = document.getElementById('pilihPTModal');
-    const mainContent = document.querySelector('.main-content');
+    const mainContent = document.getElementById('main-content');
 
     if (session) {
         if (loginSec) loginSec.classList.add('hidden');
@@ -444,8 +443,9 @@ thead th {
         if (mainContent) mainContent.classList.add('hidden');
     } else {
         if (loginSec) loginSec.classList.remove('hidden');
+        if (pilihModal) pilihModal.classList.add('hidden');
     }
-}
+} // <--- Tutup checkUser
         
       function toggleForm() {
             document.getElementById('formContainer').classList.toggle('hidden');
@@ -834,8 +834,6 @@ async function handleLogin() {
     const err = document.getElementById('loginError');
 
     btn.innerText = "Memverifikasi...";
-    err.classList.add('hidden');
-
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -843,20 +841,10 @@ async function handleLogin() {
         err.classList.remove('hidden');
         btn.innerText = "Masuk Sistem";
     } else {
-        // Ambil data user yang baru login
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        
-        // Sembunyikan form login
-        document.getElementById('loginSection').classList.add('hidden');
-        
-        // Munculkan modal pilih PT
-        const modal = document.getElementById('pilihPTModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-        } else {
-            alert("Error: Modal pilih PT tidak ditemukan di HTML!");
-        }
+        // Jika sukses, panggil checkUser untuk buka modal pilih PT
+        checkUser();
     }
+} // <--- Tutup handleLogin
 
 // 3. Fungsi untuk tombol Logout
 async function handleLogout() {
@@ -977,30 +965,19 @@ html5QrcodeScanner.render(onScanSuccess);
 
 // FUNGSI INI YANG MENJALANKAN TOMBOL PILIH PT
 function setPT(tabel, history) {
-    // 1. Masukkan pilihan ke variabel global
     currentTable = tabel;
     currentHistory = history;
 
-    console.log("Membuka Database:", currentTable);
-
-    // 2. Tutup kotak pilihan PT
+    // Sembunyikan modal, buka dashboard
     const modal = document.getElementById('pilihPTModal');
+    const main = document.getElementById('main-content');
+
     if (modal) modal.classList.add('hidden');
+    if (main) main.classList.remove('hidden');
 
-    // 3. Munculkan Dashboard (Cari elemen dengan class main-content)
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-        mainContent.classList.remove('hidden');
-    } else {
-        // Jika pakai ID di HTML-nya, gunakan ini:
-        const mainID = document.getElementById('main-content');
-        if (mainID) mainID.classList.remove('hidden');
-    }
-
-    // 4. AMBIL DATA DARI SUPABASE
+    // Ambil data
     fetchData();
-}
-
+} // <--- Tutup setPT
 		
             // Mencegah Klik Kanan
 document.addEventListener('contextmenu', event => event.preventDefault());
