@@ -892,30 +892,47 @@ async function prosesMutasi(tabelTujuan) {
     if(!confirm(`Yakin pindahkan aset ini ke ${tabelTujuan}?`)) return;
 
     try {
-        // 1. Ambil data dari tabel asal
+        // 1. Ambil data asli dari tabel asal
         const { data: aset, error: fetchErr } = await supabaseClient
             .from(currentTable)
             .select('*')
-            .eq('id_aset', asetIdSedangDiproses) // Pastikan id_aset (tanpa spasi)
+            .eq('id_aset', asetIdSedangDiproses)
             .single();
 
         if (fetchErr || !aset) throw new Error("Data aset tidak ditemukan!");
 
-        // 2. Copy ke tabel tujuan
+        // 2. Tentukan tabel history tujuan
+        // Jika pindah ke P1, masuk ke history_aset. Jika ke P2, masuk ke history_p2.
+        const tabelHistoryTujuan = tabelTujuan === 'inventaris_p1' ? 'history_aset' : 'history_p2';
+        const namaPTAsal = currentTable === 'inventaris_p1' ? 'PT PANRAMA (P1)' : 'PT KEDUA (P2)';
+
+        // 3. Masukkan ke tabel Inventaris Tujuan dengan status "Active"
         const { error: insErr } = await supabaseClient
-    .from(tabelTujuan)
-    .insert([{
-        id_aset: aset.id_aset,
-        user: aset.user || '',
-        dept: aset.dept || '',
-        device: aset.device || '',
-        specs: aset.specs || '',
-        status: 'Active' // Kita paksa statusnya jadi Mutasi biar ketahuan
-    }]);
+            .from(tabelTujuan)
+            .insert([{
+                id_aset: aset.id_aset,
+                user: aset.user,
+                dept: aset.dept,
+                device: aset.device,
+                specs: aset.specs,
+                status: 'Active', // LANGSUNG JADI IJO BRO
+                created_at: new Date()
+            }]);
 
         if (insErr) throw insErr;
 
-        // 3. Hapus dari tabel asal
+        // 4. Masukkan Log ke tabel History Tujuan
+        await supabaseClient
+            .from(tabelHistoryTujuan)
+            .insert([{
+                id_aset: aset.id_aset,
+                user: aset.user,
+                aksi: 'Mutasi Masuk',
+                keterangan: `Diterima dari ${namaPTAsal}`,
+                tanggal: new Date()
+            }]);
+
+        // 5. Hapus dari tabel asal
         const { error: delErr } = await supabaseClient
             .from(currentTable)
             .delete()
@@ -923,14 +940,14 @@ async function prosesMutasi(tabelTujuan) {
 
         if (delErr) throw delErr;
 
-        alert("Mutasi Berhasil!");
+        alert("Mutasi Berhasil & Log Histori Tersimpan!");
         tutupModalTransfer();
-        fetchData(); // Supaya data di tabel langsung hilang & pindah
+        fetchData(); 
 
-       } catch (err) {
-    console.error("Detail Error Mutasi:", err); // Ini akan memunculkan objek error lengkap di F12
-    alert("Gagal Mutasi! Cek Console F12 untuk detailnya.");
-       }
+    } catch (err) {
+        console.error("Gagal Mutasi:", err.message);
+        alert("Error: " + err.message);
+    }
 }
 function tutupModalTransfer() {
     console.log("Menutup modal..."); // Cek di F12, muncul gak?
