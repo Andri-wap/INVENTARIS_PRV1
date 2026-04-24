@@ -889,38 +889,48 @@ async function handleLogout() {
 }
 
 async function prosesMutasi(tabelTujuan) {
-    if(!confirm("Yakin mau mutasi aset ini?")) return;
+    if(!confirm(`Yakin pindahkan aset ini ke ${tabelTujuan}?`)) return;
 
-    // 1. Ambil data lengkap dari tabel asal pakai kolom 'id_aset'
-    const { data: aset } = await supabaseClient
-        .from(currentTable)
-        .select('*')
-        .eq('id_aset', asetIdSedangDiproses)
-        .single();
+    try {
+        // 1. Ambil data dari tabel asal
+        const { data: aset, error: fetchErr } = await supabaseClient
+            .from(currentTable)
+            .select('*')
+            .eq('id_aset', asetIdSedangDiproses)
+            .single();
 
-    if (aset) {
-        // 2. Masukkan ke tabel tujuan (sesuaikan nama kolom dengan image_6c11f4.png)
-        const { error: insErr } = await supabaseClient.from(tabelTujuan).insert([{
-            id_aset: aset.id_aset,
-            user: aset.user,
-            dept: aset.dept,
-            device: aset.device,
-            specs: aset.specs,
-            status: aset.status,
-            created_at: new Date()
-        }]);
+        if (fetchErr || !aset) throw new Error("Data aset tidak ditemukan!");
 
-        if (!insErr) {
-            // 3. Hapus dari tabel asal pakai id_aset
-            await supabaseClient.from(currentTable).delete().eq('id_aset', asetIdSedangDiproses);
-            
-            alert("Aset Berhasil Dimutasi ke PT Tujuan!");
-            tutupModalTransfer();
-            fetchData(); 
-        } else {
-            console.error("Gagal Insert:", insErr.message);
-            alert("Gagal: " + insErr.message);
-        }
+        // 2. Copy ke tabel tujuan
+        const { error: insErr } = await supabaseClient
+            .from(tabelTujuan)
+            .insert([{
+                id_aset: aset.id_aset,
+                user: aset.user,
+                dept: aset.dept,
+                device: aset.device,
+                specs: aset.specs,
+                status: aset.status,
+                created_at: new Date()
+            }]);
+
+        if (insErr) throw insErr;
+
+        // 3. Hapus dari tabel asal
+        const { error: delErr } = await supabaseClient
+            .from(currentTable)
+            .delete()
+            .eq('id_aset', asetIdSedangDiproses);
+
+        if (delErr) throw delErr;
+
+        alert("Mutasi Berhasil!");
+        tutupModalTransfer();
+        fetchData(); // Refresh tabel
+
+    } catch (err) {
+        console.error("Gagal Mutasi:", err.message);
+        alert("Error: " + err.message);
     }
 }
 
