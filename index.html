@@ -903,16 +903,15 @@ async function prosesMutasi(tabelTujuan) {
 
         // 2. Copy ke tabel tujuan
         const { error: insErr } = await supabaseClient
-            .from(tabelTujuan)
-            .insert([{
-                id_aset: aset.id_aset,
-                user: aset.user,
-                dept: aset.dept,
-                device: aset.device,
-                specs: aset.specs,
-                status: aset.status,
-                created_at: new Date()
-            }]); // <--- Pastikan kurung tutupnya rapi seperti ini
+    .from(tabelTujuan)
+    .insert([{
+        id_aset: aset.id_aset,
+        user: aset.user || '',
+        dept: aset.dept || '',
+        device: aset.device || '',
+        specs: aset.specs || '',
+        status: 'Mutasi' // Kita paksa statusnya jadi Mutasi biar ketahuan
+    }]);
 
         if (insErr) throw insErr;
 
