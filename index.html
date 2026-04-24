@@ -1027,27 +1027,30 @@ function setPT(tabel, history) {
 } // <--- Tutup setPT
 
 function bukaModalTransfer(id, nama) {
-    console.log("Klik Transfer:", id);
+    console.log("Memproses transfer untuk ID:", id); // Cek di console (F12)
     asetIdSedangDiproses = id;
     
     const modal = document.getElementById('modalTransfer');
-    const info = document.getElementById('infoAset');
-    
-    if (modal) {
-        if (info) info.innerText = "Aset: " + nama;
-        modal.classList.remove('hidden');
-    }
-    
-    // Logika tombol PT tujuan
+    const infoText = document.getElementById('infoAset');
     const btnP1 = document.getElementById('btnKeP1');
     const btnP2 = document.getElementById('btnKeP2');
-    
-    if (currentTable === 'inventaris_p1') {
-        if(btnP1) btnP1.classList.add('hidden');
-        if(btnP2) btnP2.classList.remove('hidden');
-    } else {
-        if(btnP1) btnP1.classList.remove('hidden');
-        if(btnP2) btnP2.classList.add('hidden');
+
+    if (infoText) infoText.innerText = "Aset: " + nama;
+    if (modal) modal.classList.remove('hidden');
+
+    // BERSIHKAN & TEMPEL ULANG PERINTAH KLIK
+    if (btnP1) {
+        btnP1.onclick = null; // Reset dulu biar gak double
+        btnP1.onclick = () => prosesMutasi('inventaris_p1');
+        // Sembunyikan kalau kita sudah di P1
+        currentTable === 'inventaris_p1' ? btnP1.classList.add('hidden') : btnP1.classList.remove('hidden');
+    }
+
+    if (btnP2) {
+        btnP2.onclick = null; // Reset
+        btnP2.onclick = () => prosesMutasi('inventaris_p2');
+        // Sembunyikan kalau kita sudah di P2
+        currentTable === 'inventaris_p2' ? btnP2.classList.add('hidden') : btnP2.classList.remove('hidden');
     }
 }
 		
