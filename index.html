@@ -1012,7 +1012,10 @@ html5QrcodeScanner.render(onScanSuccess);
             .insert([{ 
                 id_aset: idAset, 
                 user_lama: lama, 
-                user_baru: baru, 
+                user_baru: baru,
+                aksi: 'Mutasi',
+                keterangan: `Pindahan dari ${namaPTAsal} ke ${tabelTujuan === 'inventaris_p1' ? 'PT PANRAMA' : 'PT KEDUA'}`,
+                tgl_perubahan: new Date().toLocaleString('id-ID'), // Format tanggal lokal Indonesia
                 admin_eksekusi: user ? user.email : 'System' 
             }]);
 
