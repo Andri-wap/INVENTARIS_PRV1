@@ -431,7 +431,7 @@ thead th {
 		let currentTable = '';
         let currentHistory = '';
 		let data = [];
-        let asetIdSedangDiproses = null;
+        let asetIdSedangDiproses =;
      async function checkUser() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     const loginSec = document.getElementById('loginSection');
