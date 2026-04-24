@@ -431,19 +431,19 @@ thead th {
 		let currentTable = '';
         let currentHistory = '';
 		let data = [];
-      async function checkUser() {
+     async function checkUser() {
     const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    const loginSec = document.getElementById('loginSection');
+    const pilihModal = document.getElementById('pilihPTModal');
+    const mainContent = document.querySelector('.main-content');
 
     if (session) {
-        // 1. Sembunyikan login
-        document.getElementById('loginSection').classList.add('hidden');
-        
-        // 2. Munculkan MODAL PILIHAN PT (Bukan dashboardnya dulu)
-        document.getElementById('pilihPTModal').classList.remove('hidden');
-        
-        // JANGAN panggil fetchData() di sini, hapus saja baris 442 yang lama
+        if (loginSec) loginSec.classList.add('hidden');
+        if (pilihModal) pilihModal.classList.remove('hidden');
+        if (mainContent) mainContent.classList.add('hidden');
     } else {
-        document.getElementById('loginSection').classList.remove('hidden');
+        if (loginSec) loginSec.classList.remove('hidden');
     }
 }
         
