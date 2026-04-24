@@ -923,23 +923,22 @@ async function prosesMutasi(tabelTujuan) {
 
         // 4. Masukkan Log ke tabel History Tujuan
         const { error: histErr } = await supabaseClient
-            .from(tabelHistoryTujuan)
-            .insert([{
-                id_aset: aset.id_aset,        // ID barang
-                user: aset.user,              // User lama
-                user_baru: aset.user,         // User baru (sama karena cuma pindah PT)
+             .from(tabelHistoryTujuan)
+             .insert([{
+                id_aset: aset.id_aset,
+                user: aset.user,              // Nama kolom 'user' di history
+                user_lama: aset.user,         // INI YANG WAJIB ADA (Sesuai error di image_5f6e6a)
+                user_baru: aset.user,         // Kolom user_baru
                 aksi: 'Mutasi Masuk',
                 keterangan: `Diterima dari ${namaPTAsal}`,
-                tgl_perubahan: new Date().toISOString(), // Pakai format ISO biar Supabase gak nolak
-                admin_eksekusi: 'Super Admin' // Sesuaikan dengan admin yang login
-                }]);
-
+                tgl_perubahan: new Date().toISOString(),
+                admin_eksekusi: 'Super Admin'
+                    }]);
         if (histErr) {
-                console.error("Gagal simpan history:", histErr.message);
-                // Kita kasih alert biar ketahuan errornya apa
-                alert("History Gagal: " + histErr.message); 
-                }
-
+             console.error("Gagal simpan history:", histErr.message);
+             alert("History Gagal: " + histErr.message);
+             return; // Stop kalau history gagal biar data gak kehapus dulu
+            }
         // 5. Hapus dari tabel asal
         const { error: delErr } = await supabaseClient
             .from(currentTable)
