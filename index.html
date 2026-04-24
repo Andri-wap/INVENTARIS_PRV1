@@ -432,16 +432,20 @@ thead th {
         let currentHistory = '';
 		let data = [];
       async function checkUser() {
-    // Ambil sesi aktif dari Supabase
     const { data: { session } } = await supabaseClient.auth.getSession();
-    
+
     if (session) {
-        // Jika sesi ada, sembunyikan login dan tampilkan dashboard
+        // 1. Sembunyikan login
         document.getElementById('loginSection').classList.add('hidden');
-        document.querySelector('.main-content').classList.remove('hidden');
-        fetchData(); // Ambil data tabel
-            }
-       }
+        
+        // 2. Munculkan MODAL PILIHAN PT (Bukan dashboardnya dulu)
+        document.getElementById('pilihPTModal').classList.remove('hidden');
+        
+        // JANGAN panggil fetchData() di sini, hapus saja baris 442 yang lama
+    } else {
+        document.getElementById('loginSection').classList.remove('hidden');
+    }
+}
         
       function toggleForm() {
             document.getElementById('formContainer').classList.toggle('hidden');
@@ -777,14 +781,26 @@ thead th {
 
         // 1. Fungsi untuk cek status login setiap kali web dibuka
 async function checkUser() {
-    // 1. Ambil data user yang sedang aktif
+    // 1. Ambil data user aktif
     const { data: { user } } = await supabaseClient.auth.getUser();
+    
     const loginSec = document.getElementById('loginSection');
+    const pilihModal = document.getElementById('pilihPTModal'); // Ambil modal pilih PT
     const mainContent = document.querySelector('.main-content');
 
-    // 2. Mode Default: Selalu buka dashboard agar tamu bisa lihat data
-    if (loginSec) loginSec.classList.add('hidden');
-    if (mainContent) mainContent.classList.remove('hidden');
+    // 2. Logika Tampilan
+    if (user) {
+        // Jika sudah login, sembunyikan login, munculkan PILIHAN PT
+        if (loginSec) loginSec.classList.add('hidden');
+        if (pilihModal) pilihModal.classList.remove('hidden'); // <--- INI KUNCINYA
+        if (mainContent) mainContent.classList.add('hidden'); // Pastikan dashboard masih sembunyi
+    } else {
+        // Jika belum login, tampilkan login
+        if (loginSec) loginSec.classList.remove('hidden');
+        if (pilihModal) pilihModal.classList.add('hidden');
+        if (mainContent) mainContent.classList.add('hidden');
+    }
+}
 
     // 3. Logika Hak Akses Super Admin (Hanya untuk Email Andri)
     if (user && user.email === 'andri@panrama.com') {
