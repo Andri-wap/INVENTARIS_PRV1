@@ -930,9 +930,6 @@ async function prosesMutasi(tabelTujuan) {
                 user_lama: aset.user,
                 user_baru: aset.user,
                 aksi: 'Mutasi', 
-                // TAMBAHKAN INI:
-                keterangan: `Pindahan dari ${namaPTAsal} ke ${tabelTujuan === 'inventaris_p1' ? 'PT PANRAMA' : 'PT KEDUA'}`,
-                tgl_perubahan: new Date().toLocaleString('id-ID'), // Format tanggal lokal Indonesia
                 admin_eksekusi: 'Super Admin'
                 }]);
         if (histErr) {
