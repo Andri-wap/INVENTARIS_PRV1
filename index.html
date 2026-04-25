@@ -710,27 +710,22 @@ thead th {
 }    
 		
         function filterByDept(namaDept) {
-    console.log("Menyaring departemen:", namaDept);
+    console.log("Sedang mencari departemen:", namaDept);
     
-    // GANTI KE inventoryBody sesuai gambar 79122.png
+    // Pastikan ID ini sama dengan yang di HTML (inventoryBody)
     const rows = document.querySelectorAll('#inventoryBody tr');
     
-    if (rows.length === 0) {
-        console.log("Baris tabel tidak ditemukan!");
-        return;
-    }
-
     rows.forEach(row => {
-        // Di tabel kamu (79122.png), DEPT adalah kolom ke-2
-        // Maka kita gunakan cells[1] (indeks mulai dari 0)
-        const cell = row.cells[1]; 
-        if (cell) {
-            const deptCell = cell.innerText.toUpperCase();
-            if (deptCell.includes(namaDept.toUpperCase())) {
-                row.style.display = ""; 
-            } else {
-                row.style.display = "none";
-            }
+        // Ambil semua teks dalam satu baris (biar gampang)
+        const isiBaris = row.innerText.toUpperCase();
+        const cari = namaDept.toUpperCase();
+        
+        // Jika ada kata departemennya di baris itu, tampilkan
+        if (isiBaris.includes(cari)) {
+            row.style.display = "";
+            row.style.opacity = "1"; // Tambahan biar jelas tampil
+        } else {
+            row.style.display = "none";
         }
     });
 }
