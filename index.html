@@ -467,6 +467,12 @@ thead th {
         if (mainContent) mainContent.classList.add('hidden');
     }
 }
+		supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        console.log("Sesi aktif ditemukan:", event);
+        checkUser();
+    }
+});
         
       function toggleForm() {
             document.getElementById('formContainer').classList.toggle('hidden');
