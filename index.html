@@ -544,87 +544,98 @@ checkUser();
 }
         function updateStats(items) {
             const rows = Array.isArray(items) ? items : [];
+            const normalize = (text) => String(text || '').toUpperCase().trim();
 
             const countByDevice = (keyword) => rows.filter(i =>
-                String(i.device || '').toLowerCase().includes(keyword)
+                normalize(i.device).includes(keyword)
             ).length;
 
             const countByStatus = (tests) => rows.filter(i => {
-                const s = String(i.status || '').toLowerCase();
+                const s = normalize(i.status);
                 return tests.some(test => s === test);
             }).length;
 
-            const normalizeDept = (item) => String(item.dept || item.dep || '').toUpperCase().trim();
-            const countByDept = (tests) => rows.filter(i => {
-                const dept = normalizeDept(i);
-                return tests.some(test => dept.includes(test));
-            }).length;
+            const deptText = (item) => normalize(item.dept || item.dep);
+            const matchDept = (value, patterns) => patterns.some(pattern => pattern.test(value));
+
+            const deptCounters = {
+                totalHRD: [/\bHRD\b/],
+                totalPajak: [/PAJAK/, /TAX/],
+                totalPPIC: [/PPIC/, /\bPIC\b/],
+                totalEXIM: [/EXIM/, /EXM/],
+                totalFINANCE: [/FINANCE/, /FINAN/],
+                totalIT: [/\bIT\b/, /OFFICE\/IT/],
+                totalINVENTORY: [/INVENTORY/, /\bINV\b/],
+                totalCAD: [/\bCAD\b/, /CAD ROOM/],
+                totalGUDANG_ACCESSORIES: [/GUDANG ACCESSORIES/, /GUDANG ACC/],
+                totalGUDANG_KAIN: [/GUDANG KAIN/],
+                totalPACKING: [/PACKING/],
+                totalSAMPLE_PRODUKSI: [/SAMPLE PRODUKSI/, /SAMPLE PROD/],
+                totalSAMPLE_ROOM: [/SAMPLE ROOM/],
+                totalMD: [/\bMD\b/],
+                totalBC: [/\bBC\b/],
+                totalQA: [/\bQA\b/],
+                totalFACTORY_MANAGER: [/FACTORY MANAGER/],
+                totalGENERAL_MANAGER: [/GENERAL MANAGER/, /GENARAL MANAGER/],
+                totalIE: [/\bIE\b/, /IE\/PRODUKSI/, /IE\/MANAGER/],
+            };
 
             document.getElementById('totalAset').innerText = rows.length;
             document.getElementById('totalLaptop').innerText = countByDevice('laptop');
             document.getElementById('totalKomputer').innerText = rows.filter(i => {
-                const device = String(i.device || '').toLowerCase();
+                const device = normalize(i.device);
                 return device.includes('komputer') || device.includes('pc');
             }).length;
             document.getElementById('unitAktif').innerText = countByStatus(['active', 'aktif']);
             document.getElementById('unitRusak').innerText = countByStatus(['maintenance', 'broken', 'rusak']);
 
-            const deptCounters = {
-                totalHRD: ['HRD'],
-                totalPajak: ['PAJAK', 'TAX'],
-                totalPPIC: ['PPIC', 'PIC'],
-                totalEXIM: ['EXIM', 'EXM'],
-                totalFINANCE: ['FINANCE', 'FINAN'],
-                totalIT: ['IT', 'OFFICE/IT'],
-                totalINVENTORY: ['INVENTORY', 'OFFICE/INVENTORY'],
-                totalCAD: ['CAD', 'CAD ROOM'],
-                totalGUDANG_ACCESSORIES: ['GUDANG ACCESSORIES', 'GUDANG ACC'],
-                totalGUDANG_KAIN: ['GUDANG KAIN'],
-                totalPACKING: ['PACKING'],
-                totalSAMPLE_PRODUKSI: ['SAMPLE PRODUKSI', 'SAMPLE PROD'],
-                totalSAMPLE_ROOM: ['SAMPLE ROOM'],
-                totalMD: ['MD'],
-                totalBC: ['BC'],
-                totalQA: ['QA'],
-                totalFACTORY_MANAGER: ['FACTORY MANAGER'],
-                totalGENERAL_MANAGER: ['GENERAL MANAGER', 'GENARAL MANAGER'],
-                totalIE: ['IE/PRODUKSI', 'IE/MANAGER', 'IE'],
-            };
-
-            Object.entries(deptCounters).forEach(([id, tests]) => {
+            Object.entries(deptCounters).forEach(([id, patterns]) => {
                 const element = document.getElementById(id);
                 if (element) {
-                    element.innerText = countByDept(tests);
+                    element.innerText = rows.filter(item => matchDept(deptText(item), patterns)).length;
                 }
             });
 
             document.getElementById('totalPRODUKSI').innerText = rows.filter(i => {
-                const dept = normalizeDept(i);
-                return dept.includes('PRODUKSI') && !dept.includes('SAMPLE') && !dept.includes('IE');
+                const dept = deptText(i);
+                return /PRODUKSI/.test(dept) && !/SAMPLE/.test(dept) && !/\bIE\b/.test(dept);
             }).length;
         }
-		
+
         function filterByDept(namaDept) {
-    console.log("Filter departemen:", namaDept);
-    
-    const rows = document.querySelectorAll('#inventoryBody tr');
-    const cariDept = namaDept.toUpperCase();
-    
-    rows.forEach(row => {
-        // Ambil cell departemen (index 2: BARCODE, USER, DEPT)
-        const deptCell = row.cells[2];
-        if (!deptCell) return;
-        
-        const deptText = deptCell.innerText.toUpperCase().trim();
-        
-        // Tampilkan jika departemen cocok
-        if (deptText.includes(cariDept)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
+            console.log("Filter departemen:", namaDept);
+            const rows = document.querySelectorAll('#inventoryBody tr');
+            const deptPatterns = {
+                HRD: /\bHRD\b/i,
+                PAJAK: /PAJAK|TAX/i,
+                PPIC: /PPIC|\bPIC\b/i,
+                EXIM: /EXIM|EXM/i,
+                FINANCE: /FINANCE|FINAN/i,
+                IT: /\bIT\b|OFFICE\/IT/i,
+                INVENTORY: /INVENTORY|\bINV\b/i,
+                CAD: /\bCAD\b|CAD ROOM/i,
+                'GUDANG ACCESSORIES': /GUDANG ACCESSORIES|GUDANG ACC/i,
+                'GUDANG KAIN': /GUDANG KAIN/i,
+                PACKING: /PACKING/i,
+                'SAMPLE PRODUKSI': /SAMPLE PRODUKSI|SAMPLE PROD/i,
+                'SAMPLE ROOM': /SAMPLE ROOM/i,
+                MD: /\bMD\b/i,
+                BC: /\bBC\b/i,
+                QA: /\bQA\b/i,
+                'FACTORY MANAGER': /FACTORY MANAGER/i,
+                'GENERAL MANAGER': /GENERAL MANAGER|GENARAL MANAGER/i,
+                IE: /\bIE\b|IE\/PRODUKSI|IE\/MANAGER/i,
+                PRODUKSI: /PRODUKSI/i,
+            };
+            const pattern = deptPatterns[namaDept] || new RegExp(namaDept, 'i');
+
+            rows.forEach(row => {
+                const deptCell = row.cells[2];
+                if (!deptCell) return;
+                const deptText = deptCell.innerText.trim();
+                row.style.display = pattern.test(deptText) ? '' : 'none';
+            });
         }
-    });
-}
 
 		function resetFilter() {
     console.log("Tombol Total Aset diklik, meriset filter...");
