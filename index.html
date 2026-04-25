@@ -238,14 +238,14 @@ thead th {
     <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">GUDANG ACC</div>
-    <div id="totalGUDANG ACCESSORIES" class="stat-value text-primary text-xl">0</div>
+    <div id="totalGUDANG_ACCESSORIES" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
     
     <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">GUDANG KAIN</div>
-    <div id="totalGUDANG KAIN" class="stat-value text-primary text-xl">0</div>
+    <div id="totalGUDANG_KAIN" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
 
@@ -259,14 +259,14 @@ thead th {
     <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">SAMPLE PROD</div>
-    <div id="totalSAMPLE PRODUKSI" class="stat-value text-primary text-xl">0</div>
+    <div id="totalSAMPLE_PRODUKSI" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
 
     <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">SAMPLE ROOM</div>
-    <div id="totalSAMPLE ROOM" class="stat-value text-primary text-xl">0</div>
+    <div id="totalSAMPLE_ROOM" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
 
@@ -294,14 +294,14 @@ thead th {
     <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">FM</div>
-    <div id="totalFACTORY MANAGER" class="stat-value text-primary text-xl">0</div>
+<div id="totalFACTORY_MANAGER" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
-
+    
        <div class="stats shadow stat-dept">
   <div class="stat p-3">
     <div class="stat-title text-xs text-info">GM</div>
-    <div id="totalGENARAL MANAGER" class="stat-value text-primary text-xl">0</div>
+    <div id="totalGENERAL_MANAGER" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
 
@@ -439,40 +439,14 @@ thead th {
 		let data = [];
         let asetIdSedangDiproses = null;
 		
-     async function checkUser() {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    const loginSec = document.getElementById('loginSection');
-    const pilihModal = document.getElementById('pilihPTModal');
-    const mainContent = document.getElementById('main-content');
-
-    if (session) {
-        // 1. Sembunyikan form login jika sesi ada
-        if (loginSec) loginSec.classList.add('hidden');
-        
-        // 2. Logika tampilan setelah login:
-        if (!currentTable) {
-            // Jika belum pilih PT, munculkan modal pilih PT
-            if (pilihModal) pilihModal.classList.remove('hidden');
-            if (mainContent) mainContent.classList.add('hidden');
-        } else {
-            // Jika sudah pilih PT (setelah reload), langsung ke dashboard
-            if (pilihModal) pilihModal.classList.add('hidden');
-            if (mainContent) mainContent.classList.remove('hidden');
-        }
-    } else {
-        // 3. Jika tidak ada sesi, wajib login
-        if (loginSec) loginSec.classList.remove('hidden');
-        if (pilihModal) pilihModal.classList.add('hidden');
-        if (mainContent) mainContent.classList.add('hidden');
-    }
-}
-		supabaseClient.auth.onAuthStateChange((event, session) => {
+supabaseClient.auth.onAuthStateChange((event, session) => {
     if (session) {
         console.log("Sesi aktif ditemukan:", event);
         checkUser();
     }
 });
+
+checkUser();
         
       function toggleForm() {
             document.getElementById('formContainer').classList.toggle('hidden');
@@ -482,18 +456,30 @@ thead th {
             try {
                 const { data: result, error } = await supabaseClient.from(currentTable).select('*').order('id_aset', { ascending: true });
                 if (error) throw error;
-				data = result;
+	                data = Array.isArray(result) ? result : [];
                 document.getElementById('statusConnection').innerText = "Terhubung";
                 document.getElementById('statusConnection').className = "badge badge-success text-white font-bold";
                 renderTable(data);
                 updateStats(data);
             } catch (err) {
                 console.error(err);
+                const statusEl = document.getElementById('statusConnection');
+                if (statusEl) {
+                    statusEl.innerText = "Terputus";
+                    statusEl.className = "badge badge-error text-white font-bold";
+                }
             }
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('inventoryBody');
+            if (!tbody) return;
+            if (!Array.isArray(data) || data.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6" class="text-center py-10">Data tidak tersedia.</td></tr>
+                `;
+                return;
+            }
             tbody.innerHTML = data.map(item => `
                 <tr class="hover text-center">
                     <td class="p-2 bg-white">
@@ -542,198 +528,81 @@ thead th {
     if (error) {
             console.error("Gagal update:", error);
             // Cek apakah error karena RLS (Forbidden)
-            if (error.code === '42501') { 
+            if (error.code === '42501') {
                 alert("Maaf bro, cuma Super Admin (Andri) yang bisa ngubah data!");
             } else {
                 alert("Gagal simpan: " + error.message);
             }
             fetchData(); // Refresh tampilan biar teks balik ke semula
-    }else if (data && data.length > 0) {
+    } else if (data && data.length > 0) {
         console.log("Berhasil! Data di database sudah berubah.");
-        alert("Mantap Admin! Perubahan berhasil disimpan.");
-        // Ambil data terbaru agar tampilan stats & tabel sinkron
-        fetchData(); 
+        fetchData(); // Ambil data terbaru agar tampilan stats & tabel sinkron
     } else {
-        // Jika muncul ini, berarti ID 'P1.INV.KOM.0001' tidak ditemukan di kolom 'id_aset'
         alert("Gagal: ID Aset [" + idAset + "] tidak ditemukan. Pastikan nama kolom di Supabase adalah 'id_aset' (huruf kecil semua).");
         fetchData(); // Reset tampilan ke data asli
     }        
 }
-        function updateStats(data) {
-    if (!data) return;
+        function updateStats(items) {
+            const rows = Array.isArray(items) ? items : [];
 
-    // 1. Total Semua Aset
-    document.getElementById('totalAset').innerText = data.length;
+            const countByDevice = (keyword) => rows.filter(i =>
+                String(i.device || '').toLowerCase().includes(keyword)
+            ).length;
 
-    // 2. Hitung Laptop (Mencari kata 'laptop' di kolom device)
-    const jmlLaptop = data.filter(i => 
-        i.device && i.device.toLowerCase().includes('laptop')
-    ).length;
-    document.getElementById('totalLaptop').innerText = jmlLaptop;
+            const countByStatus = (tests) => rows.filter(i => {
+                const s = String(i.status || '').toLowerCase();
+                return tests.some(test => s === test);
+            }).length;
 
-    // 3. Hitung Komputer (Mencari kata 'komputer' atau 'pc' di kolom device)
-    const jmlPC = data.filter(i => 
-        i.device && (i.device.toLowerCase().includes('komputer') || i.device.toLowerCase().includes('pc'))
-    ).length;
-    document.getElementById('totalKomputer').innerText = jmlPC;
+            const normalizeDept = (item) => String(item.dept || item.dep || '').toUpperCase().trim();
+            const countByDept = (tests) => rows.filter(i => {
+                const dept = normalizeDept(i);
+                return tests.some(test => dept.includes(test));
+            }).length;
 
-    // 4. Hitung Status Aktif
-    const aktif = data.filter(i => {
-        const s = i.status ? i.status.toLowerCase() : '';
-        return s === 'active' || s === 'aktif';
-    }).length;
-    document.getElementById('unitAktif').innerText = aktif;
+            document.getElementById('totalAset').innerText = rows.length;
+            document.getElementById('totalLaptop').innerText = countByDevice('laptop');
+            document.getElementById('totalKomputer').innerText = rows.filter(i => {
+                const device = String(i.device || '').toLowerCase();
+                return device.includes('komputer') || device.includes('pc');
+            }).length;
+            document.getElementById('unitAktif').innerText = countByStatus(['active', 'aktif']);
+            document.getElementById('unitRusak').innerText = countByStatus(['maintenance', 'broken', 'rusak']);
 
-    // 5. Hitung Status Maintenance/Rusak
-    const rusak = data.filter(i => {
-        const s = i.status ? i.status.toLowerCase() : '';
-        return s === 'maintenance' || s === 'broken' || s === 'rusak';
-    }).length;
-    document.getElementById('unitRusak').innerText = rusak;
+            const deptCounters = {
+                totalHRD: ['HRD'],
+                totalPajak: ['PAJAK', 'TAX'],
+                totalPPIC: ['PPIC', 'PIC'],
+                totalEXIM: ['EXIM', 'EXM'],
+                totalFINANCE: ['FINANCE', 'FINAN'],
+                totalIT: ['IT', 'OFFICE/IT'],
+                totalINVENTORY: ['INVENTORY', 'OFFICE/INVENTORY'],
+                totalCAD: ['CAD', 'CAD ROOM'],
+                totalGUDANG_ACCESSORIES: ['GUDANG ACCESSORIES', 'GUDANG ACC'],
+                totalGUDANG_KAIN: ['GUDANG KAIN'],
+                totalPACKING: ['PACKING'],
+                totalSAMPLE_PRODUKSI: ['SAMPLE PRODUKSI', 'SAMPLE PROD'],
+                totalSAMPLE_ROOM: ['SAMPLE ROOM'],
+                totalMD: ['MD'],
+                totalBC: ['BC'],
+                totalQA: ['QA'],
+                totalFACTORY_MANAGER: ['FACTORY MANAGER'],
+                totalGENERAL_MANAGER: ['GENERAL MANAGER', 'GENARAL MANAGER'],
+                totalIE: ['IE/PRODUKSI', 'IE/MANAGER', 'IE'],
+            };
 
-    // 6. Hitung Dept HRD (Cari kata HRD di dalam teks)
-    const jmlHRD = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("HRD");
-    }).length;
-    document.getElementById('totalHRD').innerText = jmlHRD;
+            Object.entries(deptCounters).forEach(([id, tests]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerText = countByDept(tests);
+                }
+            });
 
-    // 7. Hitung Dept PAJAK (Cari kata PAJAK atau TAX)
-    const jmlPajak = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("PAJAK") || teksDept.includes("TAX");
-    }).length;
-    document.getElementById('totalPajak').innerText = jmlPajak; 
-
-     // 8. Hitung Dept PPIC
-    const jmlPPIC = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("PPIC") || teksDept.includes("PIC");
-    }).length;
-    document.getElementById('totalPPIC').innerText = jmlPPIC;  
-
-     // 9. Hitung Dept EXIM
-    const jmlEXIM = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("EXIM") || teksDept.includes("EXM");
-    }).length;
-    document.getElementById('totalEXIM').innerText = jmlEXIM;
-
-    // 10. Hitung Dept FINANCE
-    const jmlFINANCE = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("FINANCE") || teksDept.includes("FINAN");
-    }).length;
-    document.getElementById('totalFINANCE').innerText = jmlFINANCE;
-
-  // 11. Hitung Dept IT
-    const jmlIT = data.filter(i => {
-    const d = (i.dept || i.dep || "").toString().toUpperCase().trim();
-    return d === "IT" || d === "OFFICE/IT"; 
-}).length;
-    document.getElementById('totalIT').innerText = jmlIT;
-
-
-    // 12. Hitung Dept INV
-    const jmlINVENTORY = data.filter(i => {
-    const d = (i.dept || i.dep || "").toString().toUpperCase().trim();
-    return d === "INVENTORY" || d === "OFFICE/INVENTORY"; 
-}).length;
-    document.getElementById('totalINVENTORY').innerText = jmlINVENTORY;
-
-    // 13. Hitung Dept CAD
-    const jmlCAD = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("CAD") || teksDept.includes("CAD ROOM");
-    }).length;
-    document.getElementById('totalCAD').innerText = jmlCAD;
-
-    // 14. Hitung Dept GD.ACC
-    const jmlGUDANGACCESSORIES = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("UDANG ACCESSORIES") || teksDept.includes("UDANG ACCESSORIES");
-    }).length;
-    document.getElementById('totalGUDANG ACCESSORIES').innerText = jmlGUDANGACCESSORIES;
-
-    // 14. Hitung Dept GD.KAIN
-    const jmlGUDANGKAIN = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("GUDANG KAIN") || teksDept.includes("GUDANG KAIN");
-    }).length;
-    document.getElementById('totalGUDANG KAIN').innerText = jmlGUDANGKAIN;
-
-    // 15. Hitung Dept PACKING
-    const jmlPACKING = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-        return teksDept.includes("PACKING") || teksDept.includes("PACKING");
-    }).length;
-    document.getElementById('totalPACKING').innerText = jmlPACKING;
-
-    // 16. Hitung Dept SAMPLE PROD
-    const jmlSAMPLEPRODUKSI = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("SAMPLE PRODUKSI") || teksDept.includes("SAMPLE PRODUKSI");
-    }).length;
-    document.getElementById('totalSAMPLE PRODUKSI').innerText = jmlSAMPLEPRODUKSI;
-
-    // 17. Hitung Dept SAMPLE ROOM
-    const jmlSAMPLEROOM = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("SAMPLE ROOM") || teksDept.includes("SAMPLE ROOM");
-    }).length;
-    document.getElementById('totalSAMPLE ROOM').innerText = jmlSAMPLEROOM;
-
-     // 18. Hitung Dept MD
-    const jmlMD = data.filter(i => {
-        const d = (i.dept || i.dep || "").toString().toUpperCase();
-          return d.includes("MD") && !d.includes("PPIC");
-    }).length;
-    document.getElementById('totalMD').innerText = jmlMD;
-
-    // 19. Hitung Dept BC
-    const jmlBC = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("BC") || teksDept.includes("BC");
-    }).length;
-    document.getElementById('totalBC').innerText = jmlBC;
-
-    // 20. Hitung Dept QA
-    const jmlQA = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("QA") || teksDept.includes("QA");
-    }).length;
-    document.getElementById('totalQA').innerText = jmlQA;
-
-    // 21. Hitung Dept FM
-    const jmlFACTORYMANAGER = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("FACTORY MANAGER") || teksDept.includes("FACTORY MANAGER");
-    }).length;
-    document.getElementById('totalFACTORY MANAGER').innerText = jmlFACTORYMANAGER;
-
-    // 22. Hitung Dept GM
-    const jmlGENARALMANAGER = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("GENARAL MANAGER") || teksDept.includes("GENARAL MANAGER");
-    }).length;
-    document.getElementById('totalGENARAL MANAGER').innerText = jmlGENARALMANAGER;
-
-    // 23. Hitung Dept IE
-    const jmlIE = data.filter(i => {
-        const teksDept = (i.dept || i.dep || "").toString().toUpperCase();
-          return teksDept.includes("IE/PRODUKSI") || teksDept.includes("IE/MANAGER");
-    }).length;
-    document.getElementById('totalIE').innerText = jmlIE;
-
-     // 24. Hitung Dept PRODUKSI
-    const jmlPRODUKSI = data.filter(i => {
-        const d = (i.dept || i.dep || "").toString().toUpperCase();
-          return d.includes("PRODUKSI") && !d.includes("SAMPLE") && !d.includes("IE");
-    }).length;
-    document.getElementById('totalPRODUKSI').innerText = jmlPRODUKSI;
-
-
-}    
+            document.getElementById('totalPRODUKSI').innerText = rows.filter(i => {
+                const dept = normalizeDept(i);
+                return dept.includes('PRODUKSI') && !dept.includes('SAMPLE') && !dept.includes('IE');
+            }).length;
+        }
 		
         function filterByDept(namaDept) {
     console.log("Sedang mencari departemen:", namaDept);
@@ -835,14 +704,17 @@ thead th {
             setTimeout(() => { window.print(); document.body.classList.remove('printing-label'); }, 500);
         }
 
-        document.getElementById('searchInput').addEventListener('input', async (e) => {
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             const kw = e.target.value.toLowerCase();
-            const { data } = await supabaseClient.from(currentTable).select('*');
-            const filtered = data.filter(i => 
-                String(i.user).toLowerCase().includes(kw) || 
-                String(i.id_aset).toLowerCase().includes(kw) ||
-                String(i.dept).toLowerCase().includes(kw)
-            );
+            const localData = Array.isArray(data) ? data : [];
+            const filtered = localData.filter(i => {
+                const user = String(i.user || '');
+                const idAset = String(i.id_aset || '');
+                const dept = String(i.dept || i.dep || '');
+                return user.toLowerCase().includes(kw) ||
+                    idAset.toLowerCase().includes(kw) ||
+                    dept.toLowerCase().includes(kw);
+            });
             renderTable(filtered);
             updateStats(filtered);
         });
@@ -916,6 +788,8 @@ async function handleLogin() {
         err.classList.remove('hidden');
         btn.innerText = "Masuk Sistem";
     } else {
+        err.classList.add('hidden');
+        btn.innerText = "Masuk Sistem";
         // Jika sukses, panggil checkUser untuk buka modal pilih PT
         checkUser();
     }
@@ -947,8 +821,8 @@ async function handleLogout() {
         alert("Berhasil keluar! Sesi telah dibersihkan.");
 
         // 4. Paksa reload ke halaman awal (bukan dashboard)
-        // Gunakan replace agar user tidak bisa tekan tombol "Back" untuk masuk lagi
-        window.location.reload(window.location.pathname);
+        // Gunakan replace agar user tidak bisa kembali ke halaman sebelumnya
+        window.location.replace(window.location.pathname);
     }
 }
 
@@ -1070,9 +944,10 @@ html5QrcodeScanner.render(onScanSuccess);
     try {
         // Ambil data admin yang sedang login
         const { data: { user } } = await supabaseClient.auth.getUser();
+        const historyTable = currentHistory || 'history_aset';
         
         const { error } = await supabaseClient
-            .from('history_aset') // Pastikan nama tabel di Supabase sama persis
+            .from(historyTable)
             .insert([{ 
                 id_aset: idAset, 
                 user_lama: lama, 
@@ -1087,14 +962,11 @@ html5QrcodeScanner.render(onScanSuccess);
     }
 }
 
-		async function lihatHistory(idAset) {
-    // 1. Ambil data dari tabel history_aset
+	async function lihatHistory(idAset) {
+    const historyTable = currentHistory || 'history_aset';
+    // 1. Ambil data dari tabel history saat ini
     const { data: logs, error } = await supabaseClient
-        .from('history_aset')
-        .select('*')
-        .eq('id_aset', idAset)
-        .order('tgl_perubahan', { ascending: false });
-
+        .from(historyTable)
     if (error) {
         alert("Gagal ambil history: " + error.message);
         return;
