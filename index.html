@@ -707,13 +707,26 @@ thead th {
     document.getElementById('totalPRODUKSI').innerText = jmlPRODUKSI;
 
 
-
-
-
-            
-            
 }    
+		
+        function filterByDept(namaDept) {
+    console.log("Menyaring departemen:", namaDept);
+    
+    // 1. Ambil semua baris data di tabel
+    const rows = document.querySelectorAll('#isiTabelInventaris tr');
+    
+    rows.forEach(row => {
+        // Kolom departemen ada di urutan ke-3 (indeks 2)
+        const deptCell = row.cells[2].innerText.toUpperCase();
         
+        // 2. Sembunyikan yang tidak cocok, tampilkan yang cocok
+        if (deptCell.includes(namaDept.toUpperCase())) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+		}
 
         function getStatusClass(s) {
             const st = s?.toLowerCase();
@@ -1095,26 +1108,6 @@ function bukaModalTransfer(id, nama) {
         currentTable === 'inventaris_p2' ? btnP2.classList.add('hidden') : btnP2.classList.remove('hidden');
     }
 }
-
-		function filterByDept(namaDept) {
-    console.log("Menyaring departemen:", namaDept);
-    
-    // 1. Ambil semua baris data di tabel
-    const rows = document.querySelectorAll('#isiTabelInventaris tr');
-    
-    rows.forEach(row => {
-        // Kolom departemen ada di urutan ke-3 (indeks 2)
-        const deptCell = row.cells[2].innerText.toUpperCase();
-        
-        // 2. Sembunyikan yang tidak cocok, tampilkan yang cocok
-        if (deptCell.includes(namaDept.toUpperCase())) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-    });
-}
-
 		
             // Mencegah Klik Kanan
 document.addEventListener('contextmenu', event => event.preventDefault());
@@ -1130,6 +1123,7 @@ document.onkeydown = function(e) {
         return false;
     }
 };
+		
     </script>
 
     <div id="modalTransfer" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] no-print">
