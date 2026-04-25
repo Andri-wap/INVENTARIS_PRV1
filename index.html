@@ -758,6 +758,27 @@ thead th {
     });
 }
 
+		function resetFilter() {
+    console.log("Tombol Total Aset diklik, meriset filter...");
+    
+    // Kita pakai ID 'inventoryBody' sesuai screenshot kamu baris 420
+    const rows = document.querySelectorAll('#inventoryBody tr');
+    
+    if (rows.length === 0) {
+        console.error("Tabel tidak ditemukan!");
+        return;
+    }
+
+    rows.forEach(row => {
+        row.style.display = ""; // Tampilkan kembali semua baris
+    });
+    
+    // Kalau ada kolom pencarian manual, kosongkan juga
+    const searchInput = document.querySelector('input[type="text"]');
+    if (searchInput) searchInput.value = "";
+		}
+		
+
         function getStatusClass(s) {
             const st = s?.toLowerCase();
             if (st === 'active' || st === 'aktif') return 'bg-success';
