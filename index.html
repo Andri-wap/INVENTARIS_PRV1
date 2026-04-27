@@ -7,8 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -40,6 +40,18 @@ body {
         image-rendering: pixelated !important;
         image-rendering: crisp-edges !important;
     }
+}
+
+.qr-code {
+    width: 110px;
+    height: 110px;
+    max-width: 110px;
+    max-height: 110px;
+    margin: 0 auto;
+    display: block;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
 }
 
 .print-only-label { display: none; }
@@ -495,7 +507,7 @@ thead th {
                 <div class="table-wrapper"> 
                     <table class="table table-zebra w-full"> <thead>
                 <tr class="bg-base-300 text-center">
-                    <th>BARCODE</th>
+                    <th>QR CODE</th>
                     <th>USER</th>
                     <th>DEPT</th>
                     <th>DEVICE</th>
@@ -569,7 +581,8 @@ checkUser();
             tbody.innerHTML = data.map(item => `
                 <tr class="hover text-center">
                     <td class="p-2 bg-white">
-                        <svg class="barcode mx-auto" jsbarcode-value="${item.id_aset}" jsbarcode-format="code128" jsbarcode-width="1" jsbarcode-height="30" jsbarcode-fontSize="13"></svg>
+                        <canvas class="qr-code" data-value="${item.id_aset}" width="110" height="110"></canvas>
+                        <div class="text-xs text-slate-500 mt-1">${item.id_aset}</div>
                     </td>
                     <td class="editable uppercase font-bold" contenteditable="true" onblur="updateField('${item.id_aset}', 'user', this.innerText.trim())">${item.user || '-'}</td>
                     <td class="editable uppercase font-semibold" contenteditable="true" onblur="updateField('${item.id_aset}', 'dept', this.innerText.trim())">${item.dept || '-'}</td>
@@ -587,8 +600,24 @@ checkUser();
                     </td>
                 </tr>
             `).join('');
-            JsBarcode(".barcode").init();
+            generateQRCodes();
         }
+
+        function generateQRCodes() {
+            document.querySelectorAll('canvas.qr-code').forEach(canvas => {
+                const value = canvas.dataset.value || '';
+                if (!value) return;
+                new QRious({
+                    element: canvas,
+                    value,
+                    size: 110,
+                    background: 'white',
+                    foreground: '#111827',
+                    level: 'H'
+                });
+            });
+        }
+
        async function updateField(idRaw, kolom, nilaiBaru) {
     const idAset = idRaw.trim();
     const nilaiClean = nilaiBaru.trim().toUpperCase();
@@ -831,12 +860,22 @@ checkUser();
             const printArea = document.getElementById('print-label-area');
             printArea.innerHTML = `
                 <div style="padding: 15px; border: 2px solid #000; text-align: center; background: white;">
-                    <div style="font-weight: bold; font-family: sans-serif;">ASSET: ${device}</div>
-                    <svg id="singleBarcode"></svg>
-                    <div style="font-family: sans-serif;">User: ${user}</div>
+                    <div style="font-weight: bold; font-family: sans-serif; margin-bottom: 12px;">ASSET: ${device}</div>
+                    <canvas id="singleQRCode" width="220" height="220" style="margin: 0 auto; display: block; border: 1px solid #000; border-radius: 12px; background: white;"></canvas>
+                    <div style="font-family: sans-serif; margin-top: 12px;">User: ${user}</div>
                 </div>
             `;
-            JsBarcode("#singleBarcode", id, { format: "code128", width: 3, height: 100 });
+            const qrCanvas = document.getElementById('singleQRCode');
+            if (qrCanvas) {
+                new QRious({
+                    element: qrCanvas,
+                    value: id,
+                    size: 220,
+                    background: 'white',
+                    foreground: '#111827',
+                    level: 'H'
+                });
+            }
             document.body.classList.add('printing-label');
             setTimeout(() => { window.print(); document.body.classList.remove('printing-label'); }, 500);
         }
