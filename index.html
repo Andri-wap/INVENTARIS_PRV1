@@ -646,7 +646,7 @@ checkUser();
                 totalGENERAL_MANAGER: [/GENERAL MANAGER/, /GENARAL MANAGER/],
                 totalIE: [/\bIE\b/, /IE\/PRODUKSI/, /IE\/MANAGER/],
 				totalCUTTING: [/\bCUTTING\b/],
-				totalCUTTING: [/\bDIGITAL\b/],
+				totalDIGITAL: [/\bDIGITAL\b/],
             };
 
             Object.entries(deptCounters).forEach(([id, patterns]) => {
@@ -687,7 +687,7 @@ checkUser();
                 IE: /\bIE\b|IE\/PRODUKSI|IE\/MANAGER/i,
                 PRODUKSI: /PRODUKSI/i,
 				CUTTING: /\bCUTTING\b/i,
-				CUTTING: /\bDIGITAL\b/i,
+				DIGITAL: /\bDIGITAL\b/i,
             };
             const pattern = deptPatterns[namaDept] || new RegExp(namaDept, 'i');
 
