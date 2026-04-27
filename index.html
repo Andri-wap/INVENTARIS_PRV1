@@ -335,6 +335,12 @@ thead th {
     <div id="totalPRODUKSI" class="stat-value text-primary text-xl">0</div>
   </div>
 </div> 
+	<div class="stats shadow stat-dept">
+  <div class="stat p-3" onclick="filterByDept('CUTTING')" style="cursor:pointer">
+    <div class="stat-title text-xs text-info">CUTTING</div>
+    <div id="totalCUTTING" class="stat-value text-primary text-xl">0</div>
+  </div>
+</div>
     
 </div>
 
@@ -391,6 +397,8 @@ thead th {
                                 <option value="MANAGER">MANAGER</option>
                                 <option value="IE">IE</option>
                                 <option value="GENARAL MANAGER">GENARAL MANAGER</option>
+								<option value="CUTTING">CUTTING</option>
+								<option value="CUTTING">PRODUKSI</option>
                             </select>
                         </div>
                         <div class="form-control">
@@ -627,6 +635,7 @@ checkUser();
                 totalFACTORY_MANAGER: [/FACTORY MANAGER/],
                 totalGENERAL_MANAGER: [/GENERAL MANAGER/, /GENARAL MANAGER/],
                 totalIE: [/\bIE\b/, /IE\/PRODUKSI/, /IE\/MANAGER/],
+				totalCUTTING: [/\bCUTTING\b/],
             };
 
             Object.entries(deptCounters).forEach(([id, patterns]) => {
@@ -666,6 +675,7 @@ checkUser();
                 'GENERAL MANAGER': /GENERAL MANAGER|GENARAL MANAGER/i,
                 IE: /\bIE\b|IE\/PRODUKSI|IE\/MANAGER/i,
                 PRODUKSI: /PRODUKSI/i,
+				CUTTING: /\bCUTTING\b/i,
             };
             const pattern = deptPatterns[namaDept] || new RegExp(namaDept, 'i');
 
