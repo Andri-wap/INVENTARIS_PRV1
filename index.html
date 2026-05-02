@@ -222,7 +222,7 @@ thead th {
                 PT PANRAMA (P1)
             </button>
             <button onclick="setPT('inventaris_p2', 'history_p2')" class="btn btn-secondary btn-lg shadow-lg">
-                PT KEDUA (P2)
+                PT PANRAMA (P2)
             </button>
         </div>
     </div>
@@ -1034,8 +1034,8 @@ async function prosesMutasi(tabelTujuan) {
 
         if (fetchErr || !aset) throw new Error("Data aset tidak ditemukan!");
 
-        const namaPTAsal = currentTable === 'inventaris_p1' ? 'PT PANRAMA (P1)' : 'PT KEDUA (P2)';
-        const namaPTTujuan = tabelTujuan === 'inventaris_p1' ? 'PT PANRAMA' : 'PT KEDUA';
+        const namaPTAsal = currentTable === 'inventaris_p1' ? 'PT PANRAMA (P1)' : 'PT PANRAMA (P2)';
+        const namaPTTujuan = tabelTujuan === 'inventaris_p1' ? 'PT PANRAMA (P1)' : 'PT PANRAMA (P2)';
         const tabelHistoryTujuan = tabelTujuan === 'inventaris_p1' ? 'history_aset' : 'history_p2';
 
         // 2. Hapus dulu di tabel TUJUAN untuk cegah duplicate key
@@ -1342,7 +1342,7 @@ document.onkeydown = function(e) {
         
         <div class="grid gap-4">
             <button id="btnKeP1" class="btn btn-primary w-full">PT PANRAMA (P1)</button>
-            <button id="btnKeP2" class="btn btn-secondary w-full">PT KEDUA (P2)</button>
+            <button id="btnKeP2" class="btn btn-secondary w-full">PT PANRAMA (P2)</button>
             <button onclick="tutupModalTransfer()" class="btn btn-ghost mt-2 w-full border border-gray-300">Batal</button>
         </div>
     </div>
