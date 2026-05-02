@@ -613,14 +613,14 @@ checkUser();
                     <td>${item.device || '-'}</td>
                     <td><div class="badge ${getStatusClass(item.status)} border-none text-white font-bold">${item.status || '-'}</div></td>
                     <td class="no-print aksi-kolom flex gap-1 justify-center">
-                        <button onclick="printSingleLabel('${item.id_aset}', '${item.user}', '${item.device}')" class="btn btn-ghost btn-xs text-primary">Label</button>
+                        <button onclick="printSingleLabel('${item.id_aset}', '${item.user}', '${item.device}')" class="btn btn-xs btn-outline btn-info">Label</button>
                         <button onclick="lihatHistory('${item.id_aset}')" class="btn btn-xs btn-outline btn-info">
                          📜 History
                          </button>
-                         <button onclick="bukaModalTransfer('${item.id_aset}', '${item.user}')" class="btn btn-warning btn-xs text-black font-bold">
+                        <button onclick="bukaModalTransfer('${item.id_aset}', '${item.user}')" class="btn btn-xs btn-warning text-black font-bold">
                           Transfer
                          </button>
-                        <button onclick="deleteAsset('${item.id_aset}')" class="btn btn-ghost btn-xs text-error btn-hapus">Hapus</button>
+                        <button onclick="deleteAsset('${item.id_aset}')" class="btn btn-xs btn-outline btn-error text-error btn-hapus">Hapus</button>
                     </td>
                 </tr>
             `).join('');
