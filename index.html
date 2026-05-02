@@ -1220,11 +1220,11 @@ html5QrcodeScanner.render(onScanSuccess);
     }
 
     // 2. Susun tampilan history (Pakai alert dulu biar simple, atau modal kalau mau pro)
-    let daftarLog = `📜 RIWAYAT PERUBAHAN ASET: ${idAset}\n\n`;
+    let daftarLog = `📜 RIWAYAT PERUBAHAN ASET: ${idAset} (${sourceTable})\n\n`;
     
     logs.forEach((log, index) => {
         const tgl = new Date(log.tgl_perubahan).toLocaleString('id-ID');
-        daftarLog += `${index + 1}. [${tgl}]\n   User: ${log.user_lama} ➔ ${log.user_baru}\n   Admin: ${log.admin_eksekusi}\n\n`;
+        daftarLog += `${index + 1}. [${tgl}]\n   Aksi: ${log.aksi || 'Update'}\n   Keterangan: ${log.keterangan || '-'}\n   User: ${log.user_lama || '-'} ➔ ${log.user_baru || '-'}\n   Admin: ${log.admin_eksekusi || '-'}\n\n`;
     });
 
     alert(daftarLog);
