@@ -647,14 +647,12 @@ checkUser();
     const nilaiClean = nilaiBaru.trim().toUpperCase();
 
     // --- LOGIKA HISTORY MULAI DI SINI ---
-    if (kolom === 'user') {
-        // 1. Cari data lama di variabel global 'data' sebelum diupdate
+    if (kolom === 'user' || kolom === 'dept') {
         const dataLama = data.find(item => item.id_aset === idAset);
-        const namaLama = dataLama ? dataLama.user : "-";
+        const nilaiLama = dataLama ? String(dataLama[kolom] || '-') : '-';
 
-        // 2. Jika nama user benar-benar berubah, catat history-nya
-        if (namaLama !== nilaiClean) {
-            await catatHistory(idAset, namaLama, nilaiClean);
+        if (nilaiLama.trim().toUpperCase() !== nilaiClean) {
+            await catatHistory(idAset, kolom, nilaiLama, nilaiClean);
         }
     }
     // 2. Kirim ke Supabase menggunakan supabaseClient (sesuai baris 208 kamu)
@@ -1137,7 +1135,7 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
 html5QrcodeScanner.render(onScanSuccess);
 
 		// --- FUNGSI OTOMATIS CATAT HISTORY KE SUPABASE ---
-    async function catatHistory(idAset, lama, baru) {
+    async function catatHistory(idAset, kolom, lama, baru) {
     try {
         // Ambil data admin yang sedang login
         const { data: { user } } = await supabaseClient.auth.getUser();
@@ -1149,6 +1147,9 @@ html5QrcodeScanner.render(onScanSuccess);
                 id_aset: idAset, 
                 user_lama: lama, 
                 user_baru: baru,
+                aksi: kolom === 'dept' ? 'Ubah Departemen' : 'Ubah ' + kolom,
+                keterangan: `${kolom.toUpperCase()} diubah dari "${lama}" menjadi "${baru}"`,
+                tgl_perubahan: new Date().toISOString(),
                 admin_eksekusi: user ? user.email : 'System' 
             }]);
 
@@ -1164,6 +1165,9 @@ html5QrcodeScanner.render(onScanSuccess);
     // 1. Ambil data dari tabel history saat ini
     const { data: logs, error } = await supabaseClient
         .from(historyTable)
+        .select('*')
+        .eq('id_aset', idAset)
+        .order('tgl_perubahan', { ascending: false });
     if (error) {
         alert("Gagal ambil history: " + error.message);
         return;
