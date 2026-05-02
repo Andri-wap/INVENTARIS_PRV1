@@ -1141,9 +1141,7 @@ html5QrcodeScanner.render(onScanSuccess);
         const { data: { user } } = await supabaseClient.auth.getUser();
         const historyTable = currentHistory || 'history_aset';
         
-        const { error } = await supabaseClient
-            .from(historyTable)
-            .insert([{ 
+        const historyData = [{ 
                 id_aset: idAset, 
                 user_lama: lama, 
                 user_baru: baru,
@@ -1151,7 +1149,21 @@ html5QrcodeScanner.render(onScanSuccess);
                 keterangan: `${kolom.toUpperCase()} diubah dari "${lama}" menjadi "${baru}"`,
                 tgl_perubahan: new Date().toISOString(),
                 admin_eksekusi: user ? user.email : 'System' 
-            }]);
+            }];
+
+        let { error } = await supabaseClient
+            .from(historyTable)
+            .insert(historyData);
+
+        if (error && historyTable === 'history_p2') {
+            console.warn("Gagal simpan history ke history_p2, coba fallback ke history_aset:", error.message);
+            const fallback = await supabaseClient
+                .from('history_aset')
+                .insert(historyData);
+            if (fallback.error) throw fallback.error;
+            console.log("History berhasil dicatat ke history_aset sebagai fallback untuk:", idAset);
+            return;
+        }
 
         if (error) throw error;
         console.log("History berhasil dicatat untuk:", idAset);
@@ -1162,15 +1174,44 @@ html5QrcodeScanner.render(onScanSuccess);
 
 	async function lihatHistory(idAset) {
     const historyTable = currentHistory || 'history_aset';
-    // 1. Ambil data dari tabel history saat ini
-    const { data: logs, error } = await supabaseClient
-        .from(historyTable)
-        .select('*')
-        .eq('id_aset', idAset)
-        .order('tgl_perubahan', { ascending: false });
-    if (error) {
-        alert("Gagal ambil history: " + error.message);
+    const fallbackTable = historyTable === 'history_p2' ? 'history_aset' : 'history_p2';
+
+    async function fetchLogs(tableName) {
+        return await supabaseClient
+            .from(tableName)
+            .select('*')
+            .eq('id_aset', idAset)
+            .order('tgl_perubahan', { ascending: false });
+    }
+
+    let { data: logs, error } = await fetchLogs(historyTable);
+    let sourceTable = historyTable;
+
+    if (error && historyTable === 'history_p2') {
+        const fallbackResult = await fetchLogs(fallbackTable);
+        if (fallbackResult.error) {
+            alert("Gagal ambil history dari " + historyTable + ": " + error.message + "\nFallback gagal: " + fallbackResult.error.message);
+            return;
+        }
+        if (fallbackResult.data && fallbackResult.data.length > 0) {
+            logs = fallbackResult.data;
+            sourceTable = fallbackTable;
+        }
+    } else if (error) {
+        alert("Gagal ambil history dari " + historyTable + ": " + error.message);
         return;
+    }
+
+    if (!logs || logs.length === 0) {
+        const fallbackResult = await fetchLogs(fallbackTable);
+        if (fallbackResult.error) {
+            alert("Gagal ambil history fallback: " + fallbackResult.error.message);
+            return;
+        }
+        if (fallbackResult.data && fallbackResult.data.length > 0) {
+            logs = fallbackResult.data;
+            sourceTable = fallbackTable;
+        }
     }
 
     if (!logs || logs.length === 0) {
