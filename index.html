@@ -1057,18 +1057,24 @@ async function prosesMutasi(tabelTujuan) {
         if (insErr) throw insErr;
 
         // 4. Masukkan Log ke tabel History (Pakai ISO Format agar tidak null/error)
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const historyPayload = {
+            id_aset: aset.id_aset,
+            user: aset.user,
+            user_lama: aset.user,
+            user_baru: aset.user,
+            aksi: 'Mutasi',
+            jenis_mutasi: 'Transfer',
+            asal_pt: namaPTAsal,
+            tujuan_pt: namaPTTujuan,
+            keterangan: `Pindahan dari ${namaPTAsal} ke ${namaPTTujuan}`,
+            tgl_perubahan: new Date().toISOString(),
+            admin_eksekusi: user ? user.email : 'System'
+        };
+
         await supabaseClient
              .from(tabelHistoryTujuan)
-             .insert([{
-                id_aset: aset.id_aset,
-                user: aset.user,
-                user_lama: aset.user, // Kolom wajib
-                user_baru: aset.user, // Kolom wajib
-                aksi: 'Mutasi', 
-                keterangan: `Pindahan dari ${namaPTAsal} ke ${namaPTTujuan}`,
-                tgl_perubahan: new Date().toISOString(), // Standard Supabase
-                admin_eksekusi: 'Super Admin'
-            }]);
+             .insert([historyPayload]);
 
         // 5. Hapus dari tabel asal
         const { error: delErr } = await supabaseClient
@@ -1219,15 +1225,53 @@ html5QrcodeScanner.render(onScanSuccess);
         return;
     }
 
-    // 2. Susun tampilan history (Pakai alert dulu biar simple, atau modal kalau mau pro)
-    let daftarLog = `📜 RIWAYAT PERUBAHAN ASET: ${idAset} (${sourceTable})\n\n`;
-    
-    logs.forEach((log, index) => {
+    renderHistoryModal(idAset, logs, sourceTable);
+}
+
+function renderHistoryModal(idAset, logs, sourceTable) {
+    const modal = document.getElementById('historyModal');
+    const title = document.getElementById('historyModalTitle');
+    const source = document.getElementById('historyModalSource');
+    const body = document.getElementById('historyModalBody');
+
+    if (!modal || !title || !source || !body) {
+        alert('History modal tidak tersedia.');
+        return;
+    }
+
+    title.innerText = `Riwayat Aset: ${idAset}`;
+    source.innerText = `Sumber: ${sourceTable}`;
+    body.innerHTML = '';
+
+    logs.forEach((log) => {
         const tgl = new Date(log.tgl_perubahan).toLocaleString('id-ID');
-        daftarLog += `${index + 1}. [${tgl}]\n   Aksi: ${log.aksi || 'Update'}\n   Keterangan: ${log.keterangan || '-'}\n   User: ${log.user_lama || '-'} ➔ ${log.user_baru || '-'}\n   Admin: ${log.admin_eksekusi || '-'}\n\n`;
+        const card = document.createElement('div');
+        card.className = 'bg-base-100 p-4 rounded-xl shadow-sm border border-gray-200 mb-4';
+        card.innerHTML = `
+            <div class="flex justify-between gap-2 items-start">
+                <div>
+                    <div class="font-semibold text-sm text-gray-800">${log.aksi || 'Update'}</div>
+                    <div class="text-xs text-gray-500">${tgl}</div>
+                </div>
+                <span class="badge badge-secondary">${log.jenis_mutasi || 'Perubahan'}</span>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">${log.keterangan || '-'}</p>
+            <div class="mt-3 grid gap-2 text-sm text-gray-700">
+                <div><span class="font-semibold">User:</span> ${log.user_lama || '-'} ➔ ${log.user_baru || '-'}</div>
+                ${log.asal_pt ? `<div><span class="font-semibold">Dari:</span> ${log.asal_pt}</div>` : ''}
+                ${log.tujuan_pt ? `<div><span class="font-semibold">Ke:</span> ${log.tujuan_pt}</div>` : ''}
+                <div><span class="font-semibold">Admin:</span> ${log.admin_eksekusi || '-'}</div>
+            </div>
+        `;
+        body.appendChild(card);
     });
 
-    alert(daftarLog);
+    modal.classList.remove('hidden');
+}
+
+function closeHistoryModal() {
+    const modal = document.getElementById('historyModal');
+    if (modal) modal.classList.add('hidden');
 }
 
 // FUNGSI INI YANG MENJALANKAN TOMBOL PILIH PT
@@ -1301,6 +1345,19 @@ document.onkeydown = function(e) {
             <button id="btnKeP2" class="btn btn-secondary w-full">PT KEDUA (P2)</button>
             <button onclick="tutupModalTransfer()" class="btn btn-ghost mt-2 w-full border border-gray-300">Batal</button>
         </div>
+    </div>
+</div>
+
+<div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] no-print">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full mx-4 overflow-hidden">
+        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+            <div>
+                <h2 id="historyModalTitle" class="text-lg font-bold text-gray-900">Riwayat Aset</h2>
+                <p id="historyModalSource" class="text-sm text-gray-500">Sumber:</p>
+            </div>
+            <button onclick="closeHistoryModal()" class="btn btn-ghost btn-sm">Tutup</button>
+        </div>
+        <div id="historyModalBody" class="p-6 max-h-[70vh] overflow-y-auto bg-slate-50"></div>
     </div>
 </div>
 
